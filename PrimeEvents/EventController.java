@@ -36,6 +36,32 @@ public class EventController
         return users;
     }
 
+    public Owner getOwnerById(int id)
+    {
+        for(int i = 0; i<getUsers().size();i++)
+        {
+            if(getUsers().get(i).getUserId() == id)
+            {
+                User currentUser = getUsers().get(i);
+                return new Owner(currentUser.getUserId(),currentUser.getFirstName(),currentUser.getLastName(),
+                    currentUser.getPhoneNumber(),currentUser.getEmail(),currentUser.getPassword(),currentUser.getRole());      
+            }
+        }
+        return null;
+    }
+
+    public Hall getHallById(int id)
+    {
+        for(int i = 0; i< getHalls().size();i++)
+        {
+            if(getHalls().get(i).getHallId() == id)
+            {
+                return getHalls().get(i);           
+            }
+        }
+        return null;
+    }
+
     public int getMaxUserId()
     {
         if(getUsers().size() != 0)
@@ -57,7 +83,6 @@ public class EventController
 
     public void sortUserByLoginStatus()
     {
-
         Collections.sort(getUsers(), new Comparator<User>()
             {
                 public int compare(User u1, User u2) {
@@ -89,14 +114,32 @@ public class EventController
         showMenu();
     }
 
-    private void readUsersFile()
+    private void fetchHallsData()
+    {
+        String fileData = readFile("halls.txt");
+        String[] data = fileData.split("\\n"); // split data by new line character
+        for(int i = 0 ; i < data.length ; i++)
+        {
+            String[] values = data[i].split(";");
+            ArrayList<String> events = new ArrayList<String>();
+            String[] eventTypes = values[6].split(",");
+            for(int j = 0 ; j < eventTypes.length ; j++)
+            {
+                events.add(eventTypes[j]);
+            }
+            halls.add(new Hall( Integer.parseInt(values[0]),values[1],values[2],values[3],Integer.parseInt(values[4]),
+                    Integer.parseInt(values[5]),events ,Integer.parseInt(values[7]), getOwnerById(Integer.parseInt(values[8]))));
+        }
+    }
+
+    private void fetchUsersData()
     {
         String fileData = readFile("users.txt");
         String[] data = fileData.split("\\n"); // split data by new line character
         for(int i = 0 ; i < data.length ; i++)
         {
             String[] values = data[i].split(";");            
-            users.add(new User( Integer.parseInt(values[0]),values[1],values[2],values[3],values[4],values[5],values[6])); // add a venue to the collection
+            users.add(new User( Integer.parseInt(values[0]),values[1],values[2],values[3],values[4],values[5],values[6]));
         }        
     }
 
@@ -219,10 +262,10 @@ public class EventController
 
     private void registerUser()
     {
+        displayHeader("REGISTRATION");
         boolean isValid = false;
         while(!isValid)
         {
-            displayHeader("REGISTRATION");
             switch(acceptIntegerInput("1. Customer\n2. Owner\nEnter your choice:"))
             {
                 case 1:
@@ -257,7 +300,7 @@ public class EventController
 
     private void doLogin()
     {
-        readUsersFile();
+        fetchUsersData();
         displayHeader("LOGIN");
         String email = acceptStringInput("Enter your email");
         String password = acceptStringInput("Enter your password");
@@ -297,208 +340,138 @@ public class EventController
 
     private void showHome()
     {
-        displayHeader("HOME");
+        fetchHallsData();
         sortUserByLoginStatus();
         if(getUsers().get(0).getRole().equalsIgnoreCase("CUSTOMER"))
         {
-            int input = acceptIntegerInput("1. Search Halls\n2. View Quotation Responses\n3. Manage Bookings\n4. Review Halls\n0. Logout\nEnter your choice:");
-            switch(input)
+            displayHeader("HOME - CUSTOMER");
+            boolean isValid = false;
+            while(!isValid)
             {
-                case 1: searchHalls(); break;
-                case 2: showQuotationResponse(); break;
-                case 3: manageBooking(); break;
-                case 4: showReviewHall(); break;
-                case 0: logout(); break;
+                int input = acceptIntegerInput("1. Search Halls\n2. View Quotation Responses\n3. Manage Bookings\n4. Review Halls\n0. Logout\nEnter your choice:");
+                switch(input)
+                {
+                    case 1: isValid = true; searchHalls(); break;
+                    case 2: isValid = true;showQuotationResponse(); break;
+                    case 3: isValid = true;manageBooking(); break;
+                    case 4: isValid = true;showReviewHall(); break;
+                    case 0: isValid = true;logout(); break;
+                    default:
+                    System.out.println("Invalid choice. Please try again");
+                }
             }
         }
         else
         {
-            int input = acceptIntegerInput("1. Manage Halls\n2. Manage Bookings\n3. Manage Payments\n4. Manage Discounts\n5. View Quotation Requests\n0. Logout\nEnter your choice:");
-            switch(input)
+            displayHeader("HOME - OWNER");
+            boolean isValid = false;
+            while(!isValid)
             {
-                case 1: showManageHalls();  break;
-                case 2:  break;
-                case 3:  break;
-                case 4:  break;
-                case 5:  break;
-                case 0: logout(); break;
-            }
-
-        }
-    }
-
-    private void showManageHalls()
-    {
-        displayHeader("MANAGE HALLS");
-        char input = acceptStringInput("1. Create Hall\n2. Modify Hall\n3. Delete Hall\nB. Go back to home\nEnter your choice:").charAt(0);
-        switch(input)
-        {
-            case '1': createHall(); break;
-            case '2': chooseHall(false); break;
-            case '3': deleteHall(); break;
-            case 'b': showHome(); break;
-        }
-    }
-
-    private void createHall()
-    {
-        displayHeader("CREATE HALL");
-        String fname = acceptStringInput("Enter the hall name");
-        String lname = acceptStringInput("Enter the suburb");
-        String dob = acceptStringInput("Enter the address");
-        String phone = acceptStringInput("Enter the capacity");
-        String isVet = acceptStringInput("Enter the deposit%");
-        String isVet1 = acceptStringInput("Enter the approximate price");
-        String isVet2 = acceptStringInput("Enter the event types(comma separated)");
-        System.out.println("Hall Created!! Going back to manage Halls");
-        showManageHalls();
-    }
-
-    private void chooseHall(boolean isDelete)
-    {
-        displayHeader("CHOOSE HALL");
-        System.out.println("1. Hall 1, Caulfield\n2. Hall 2, Oakleigh\n3. Hall 3, Clayton"+
-            "\n4. Hall 4, CBD\n5. Hall 5, Brighton\n6. Hall 6, Clayton");
-
-        if(!isDelete)
-        {
-            char input = acceptStringInput("Options:\nPress number to choose hall to modify\nF. Apply a Filter\nB. Go Back to Manage Halls").charAt(0);
-
-            switch(input)
-            {
-                case '1': modHall(); break;
-                case 'f' | 'F': applyFilter(); break;
-                case 'b' | 'B': showManageHalls(); break;
+                int input = acceptIntegerInput("1. Manage Halls\n2. Manage Bookings\n3. Manage Payments\n4. Manage Discounts\n5. View Quotation Requests\n0. Logout\nEnter your choice:");
+                switch(input)
+                {
+                    case 1: isValid = true; showManageHalls(); break;
+                    case 2: isValid = true; break;
+                    case 3: isValid = true; break;
+                    case 4: isValid = true; break;
+                    case 5: isValid = true; break;
+                    case 0: isValid = true; logout(); break; 
+                    default:
+                    System.out.println("Invalid choice. Please try again");
+                }
             }
         }
-        else
-        {
-            char input = acceptStringInput("Options:\nPress number to choose hall to delete\nF. Apply a Filter\nB. Go Back to Manage Halls").charAt(0);
-
-            switch(input)
-            {
-                case '1': deletePrompt(); break;
-                case '2': applyFilter(); break;
-                case '3': showManageHalls(); break;
-            }
-        }
-    }
-
-    private void deletePrompt()
-    {
-        char input = acceptStringInput("Are you sure you want to delete Hall 6, Clayton? (Y/N)").charAt(0);
-        switch(input)
-        {
-            case 'y': 
-            System.out.println("Hall deleted!! Going back to manage Halls");
-            showManageHalls();
-            break;
-            case 'n': 
-            System.out.println("Operation cancelled! Going back to manage halls");
-            showManageHalls();
-            break;
-        }
-    }
-
-    private void modHall()
-    {
-        displayHeader("MODIFY HALL");
-        System.out.println("Name: Hall 2\nSuburb: Oakleigh\nAddress: 17, Oakleigh Road, Oakleigh"+
-            "\nCapacity: 500\nDeposit: 50%\nEvent Types: Wedding ceremony, Wedding reception, Birthday\nPrice: $2000 (Catering extra)");
-        char input = acceptStringInput("Do you want to change hall name (Y/N)").charAt(0);
-        if(input == 'y'|| input == 'Y')
-        {
-            String name = acceptStringInput("Enter the new hall name");        
-        }
-        input = acceptStringInput("Do you want to change hall suburb (Y/N)").charAt(0);
-        if(input == 'y'|| input == 'Y')
-        {
-            String name = acceptStringInput("Enter the new hall suburb");        
-        }
-        input = acceptStringInput("Do you want to change hall address (Y/N)").charAt(0);
-        if(input == 'y'|| input == 'Y')
-        {
-            String name = acceptStringInput("Enter the new hall address");        
-        }
-        input = acceptStringInput("Do you want to change hall capacity (Y/N)").charAt(0);
-        if(input == 'y'|| input == 'Y')
-        {
-            String name = acceptStringInput("Enter the new hall capacity");        
-        }
-        input = acceptStringInput("Do you want to change hall deposit% (Y/N)").charAt(0);
-        if(input == 'y'|| input == 'Y')
-        {
-            String name = acceptStringInput("Enter the new hall deposit%");        
-        }
-        input = acceptStringInput("Do you want to change hall event types (Y/N)").charAt(0);
-        if(input == 'y'|| input == 'Y')
-        {
-            String name = acceptStringInput("Enter the new hall event types(comma separated)");        
-        }
-        input = acceptStringInput("Do you want to change hall price (Y/N)").charAt(0);
-        if(input == 'y'|| input == 'Y')
-        {
-            String name = acceptStringInput("Enter the new hall price");        
-        }
-        System.out.println("Hall details modified");
-        System.out.println("Name: Hall 2\nSuburb: Oakleigh\nAddress: 17, Oakleigh Road, Oakleigh"+
-            "\nCapacity: 450\nDeposit: 50%\nEvent Types: Birthday, Wedding ceremony, Wedding reception, Anniversary\nPrice: $2000 (Catering extra)");
-        System.out.println("\nGoing back to Manage Halls");
-        showManageHalls();
-    }
-
-    private void deleteHall()
-    {
-        chooseHall(true);
     }
 
     private void logout()
     {
-        char input = acceptStringInput("Are you sure you want to log out(y/n)").charAt(0);
-        switch(input)
-        {
-            case 'y':
-            System.out.println("Successfully logged out!!");
-            sortUserByLoginStatus();
-            getUsers().get(0).setIsLoggedIn(false);
-            start();
-            break;
-            case 'n':
-            showHome();
-            break;
+        char input = acceptStringInput("Are you sure you want to log out(y/n)").toLowerCase().charAt(0);
+        boolean isValid = false;
+        while(!isValid)
+        {switch(input)
+            {
+                case 'y':
+                isValid = true;
+                System.out.println("Successfully logged out!!");
+                sortUserByLoginStatus();
+                getUsers().get(0).setIsLoggedIn(false);
+                start();
+                break;
+                case 'n':
+                isValid = true;
+                showHome();
+                break;
+                default:
+                System.out.println("Invalid choice. Please try again");
+            }
         }
     }
 
     private void searchHalls()
     {
         displayHeader("SEARCH HALLS");
-        System.out.println("1. Hall 1, Caulfield\n2. Hall 2, Oakleigh\n3. Hall 3, Clayton"+
-            "\n4. Hall 4, CBD\n5. Hall 5, Brighton\n6. Hall 6, Clayton\n7. Hall 7, CBD"+
-            "\n8. Hall 8, Caulfield\n9. Hall 9, Clayton\n10. Hall 10, CBD");
-        System.out.println("\nOptions:");
-        char searchInput = acceptStringInput("Press number to view hall details"+
-                "\n----OR----\nF. Apply a Filter\nB. Go Back to Home"+
-                "\nN. View Next Page\nEnter your choice:").charAt(0);
-        switch(searchInput)
+        for(int i = 0; i < getHalls().size(); i++)
         {
-            case '1': viewHallDetails(); break;
-            case 'f': applyFilter(); break;
-            case 'b': showHome(); break;
-            case 'n': searchHalls(); break;
+            System.out.println(getHalls().get(i).displayShort() + "\n");
+        }
+        System.out.println("\nOptions:");
+        String searchInput = acceptStringInput("Press number to view hall details"+
+                "\n----OR----\nF. Apply a Filter\nB. Go Back to Home\n0. Logout"+
+                "\nEnter your choice:");
+
+        if(isInteger(searchInput))
+        {
+            viewHallDetails(Integer.parseInt(searchInput));
+        }
+        else
+        {
+            char selectInput = searchInput.toLowerCase().charAt(0);
+            switch(selectInput)
+            {
+                case 'f': applyFilter(); break;
+                case 'b': showHome(); break;
+                case '0': logout(); break;
+            }
         }
     }
 
-    private void viewHallDetails()
+    private boolean isInteger(String s)
+    {
+        try 
+        { 
+            Integer.parseInt(s); 
+        } 
+        catch(NumberFormatException e) 
+        { 
+            return false; 
+        }
+        catch(NullPointerException e) 
+        {
+            return false;
+        }
+        return true;
+    }
+
+    private void viewHallDetails(int id)
     {
         displayHeader("VIEW HALL");
-        System.out.println("Name: Hall 17\nSuburb: Clayton\nAddress: 17, Clayton Road, Clayton"+
-            "\nCapacity: 300\nDeposit: 50%\nEvent Types: Wedding ceremony, Wedding reception, Birthday, Anniversary\nPrice: $1200 (Catering extra)");
-        char hallDetInput = acceptStringInput("\nQ. Request Quotation\nR. View Reviews\nB. Go Back to Search Halls\nEnter your choice:").charAt(0);
-        switch(hallDetInput)
+        Hall viewableHall = getHallById(id);
+        if(viewableHall == null)
         {
-            case 'q': requestQuotation(); break;
-            case 'r': showReviews(); break;
-            case 'b': searchHalls(); break;
+            System.out.println("Invalid Hall ID entered. Please try again!");
+            searchHalls();
+        }
+        else
+        {
+            System.out.println(viewableHall.displayLong());
+            char input = acceptStringInput("\nQ. Request Quotation\nR. View Reviews\nB. Go Back to Search Halls\nEnter your choice:")
+                .toLowerCase().charAt(0);
+            switch(input)
+            {
+                case 'q': requestQuotation(); break;
+                case 'r': showReviews(); break;
+                case 'b': searchHalls(); break;
+            }
         }
     }
 
@@ -520,7 +493,7 @@ public class EventController
         System.out.println("Name: Hall 17\nSuburb: Clayton\n\nReviews:"+
             "\nIt is a spacious hall with plenty of sitting. 5 stars.\n\nGreat hall in the heart of Clayton. 4 stars.");
         char goBack = acceptStringInput("\nB. Go Back to View Hall\nEnter your choice:").charAt(0);
-        viewHallDetails();
+        //viewHallDetails();
     }
 
     private void applyFilter()
@@ -743,6 +716,131 @@ public class EventController
         }
     }
 
+    private void showManageHalls()
+    {
+        displayHeader("MANAGE HALLS");
+        char input = acceptStringInput("1. Create Hall\n2. Modify Hall\n3. Delete Hall\nB. Go back to home\nEnter your choice:").charAt(0);
+        switch(input)
+        {
+            case '1': createHall(); break;
+            case '2': chooseHall(false); break;
+            case '3': deleteHall(); break;
+            case 'b': showHome(); break;
+        }
+    }
+
+    private void createHall()
+    {
+        displayHeader("CREATE HALL");
+        String fname = acceptStringInput("Enter the hall name");
+        String lname = acceptStringInput("Enter the suburb");
+        String dob = acceptStringInput("Enter the address");
+        String phone = acceptStringInput("Enter the capacity");
+        String isVet = acceptStringInput("Enter the deposit%");
+        String isVet1 = acceptStringInput("Enter the approximate price");
+        String isVet2 = acceptStringInput("Enter the event types(comma separated)");
+        System.out.println("Hall Created!! Going back to manage Halls");
+        showManageHalls();
+    }
+
+    private void chooseHall(boolean isDelete)
+    {
+        displayHeader("CHOOSE HALL");
+        System.out.println("1. Hall 1, Caulfield\n2. Hall 2, Oakleigh\n3. Hall 3, Clayton"+
+            "\n4. Hall 4, CBD\n5. Hall 5, Brighton\n6. Hall 6, Clayton");
+
+        if(!isDelete)
+        {
+            char input = acceptStringInput("Options:\nPress number to choose hall to modify\nF. Apply a Filter\nB. Go Back to Manage Halls").charAt(0);
+
+            switch(input)
+            {
+                case '1': modHall(); break;
+                case 'f' | 'F': applyFilter(); break;
+                case 'b' | 'B': showManageHalls(); break;
+            }
+        }
+        else
+        {
+            char input = acceptStringInput("Options:\nPress number to choose hall to delete\nF. Apply a Filter\nB. Go Back to Manage Halls").charAt(0);
+
+            switch(input)
+            {
+                case '1': deletePrompt(); break;
+                case '2': applyFilter(); break;
+                case '3': showManageHalls(); break;
+            }
+        }
+    }
+
+    private void deletePrompt()
+    {
+        char input = acceptStringInput("Are you sure you want to delete Hall 6, Clayton? (Y/N)").charAt(0);
+        switch(input)
+        {
+            case 'y': 
+            System.out.println("Hall deleted!! Going back to manage Halls");
+            showManageHalls();
+            break;
+            case 'n': 
+            System.out.println("Operation cancelled! Going back to manage halls");
+            showManageHalls();
+            break;
+        }
+    }
+
+    private void modHall()
+    {
+        displayHeader("MODIFY HALL");
+        System.out.println("Name: Hall 2\nSuburb: Oakleigh\nAddress: 17, Oakleigh Road, Oakleigh"+
+            "\nCapacity: 500\nDeposit: 50%\nEvent Types: Wedding ceremony, Wedding reception, Birthday\nPrice: $2000 (Catering extra)");
+        char input = acceptStringInput("Do you want to change hall name (Y/N)").charAt(0);
+        if(input == 'y'|| input == 'Y')
+        {
+            String name = acceptStringInput("Enter the new hall name");        
+        }
+        input = acceptStringInput("Do you want to change hall suburb (Y/N)").charAt(0);
+        if(input == 'y'|| input == 'Y')
+        {
+            String name = acceptStringInput("Enter the new hall suburb");        
+        }
+        input = acceptStringInput("Do you want to change hall address (Y/N)").charAt(0);
+        if(input == 'y'|| input == 'Y')
+        {
+            String name = acceptStringInput("Enter the new hall address");        
+        }
+        input = acceptStringInput("Do you want to change hall capacity (Y/N)").charAt(0);
+        if(input == 'y'|| input == 'Y')
+        {
+            String name = acceptStringInput("Enter the new hall capacity");        
+        }
+        input = acceptStringInput("Do you want to change hall deposit% (Y/N)").charAt(0);
+        if(input == 'y'|| input == 'Y')
+        {
+            String name = acceptStringInput("Enter the new hall deposit%");        
+        }
+        input = acceptStringInput("Do you want to change hall event types (Y/N)").charAt(0);
+        if(input == 'y'|| input == 'Y')
+        {
+            String name = acceptStringInput("Enter the new hall event types(comma separated)");        
+        }
+        input = acceptStringInput("Do you want to change hall price (Y/N)").charAt(0);
+        if(input == 'y'|| input == 'Y')
+        {
+            String name = acceptStringInput("Enter the new hall price");        
+        }
+        System.out.println("Hall details modified");
+        System.out.println("Name: Hall 2\nSuburb: Oakleigh\nAddress: 17, Oakleigh Road, Oakleigh"+
+            "\nCapacity: 450\nDeposit: 50%\nEvent Types: Birthday, Wedding ceremony, Wedding reception, Anniversary\nPrice: $2000 (Catering extra)");
+        System.out.println("\nGoing back to Manage Halls");
+        showManageHalls();
+    }
+
+    private void deleteHall()
+    {
+        chooseHall(true);
+    }
+
     private void displayHeader(String header)
     {
         System.out.println("\n***********************************");
@@ -769,7 +867,7 @@ public class EventController
         System.out.println(displayMessage);
         while(!console.hasNextInt())
         {
-            System.out.println("Incorrect Input!!\n " + displayMessage);
+            System.out.println("Incorrect Input!!\n" + displayMessage);
             console.next();
         }
         return console.nextInt();

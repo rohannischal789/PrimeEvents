@@ -15,6 +15,13 @@ public class Owner extends User
      */
     public Owner()
     {
+        
+    }
+    
+    public Owner(int newUserId, String newFirstName, String newLastName, 
+    String newPhoneNo,String newEmail,String newPassword,String newRole)
+    {
+        super(newUserId, newFirstName, newLastName,newPhoneNo,newEmail,newPassword,newRole);
     }
 
     

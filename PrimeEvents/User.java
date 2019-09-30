@@ -1,4 +1,5 @@
 
+
 /**
  * Write a description of class User here.
  *
@@ -16,7 +17,8 @@ public class User
     private String password;
     private String role;
     private Boolean isLoggedIn;
-
+    private Boolean isLockedOut;
+    
     /**
      * Constructor for objects of class User
      */
@@ -86,6 +88,11 @@ public class User
         return isLoggedIn;
     }
     
+    public Boolean getIsLockedOut()
+    {
+        return isLockedOut;
+    }
+    
     public void setUserId(int newUserId)
     {
         userId = newUserId;
@@ -125,5 +132,10 @@ public class User
     public void setIsLoggedIn(Boolean newlog)
     {
         isLoggedIn = newlog;
+    }
+    
+    public void setIsLockedOut(Boolean newLockedOut)
+    {
+        isLockedOut = newLockedOut;
     }
 }

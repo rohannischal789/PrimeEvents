@@ -1,1 +1,3 @@
-1|Rohan|Nischal|2929292929|rohan.nischal@yahoo.com|123456|CUSTOMER|29-10-1993|false
+1;Rohan;Nischal;2929292929;rohan.nischal@yahoo.com;123456;CUSTOMER
+2;R;N;333244444;rn;test;OWNER
+3;k;t;9393939322;kt;123;CUSTOMER

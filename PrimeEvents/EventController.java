@@ -11,7 +11,6 @@ import java.util.Comparator;
  */
 public class EventController
 {
-    // instance variables - replace the example below with your own
     private ArrayList<Hall> halls;
     private ArrayList<User> users;
     //private ArrayList<Owner> owners;
@@ -71,6 +70,7 @@ public class EventController
     String newPhoneNo,String newEmail,String newPassword,String newRole)
     {
         getUsers().add(new User(getMaxUserId() + 1,newFirstName,newLastName,newPhoneNo,newEmail,newPassword,newRole));
+        writeToUsersFile("users.txt");
     }
 
     public void setUsers(ArrayList<User> newUsers)
@@ -95,22 +95,19 @@ public class EventController
         String[] data = fileData.split("\\n"); // split data by new line character
         for(int i = 0 ; i < data.length ; i++)
         {
-            String[] values = data[i].split("|"); //split each row by ,            
+            String[] values = data[i].split(";");            
             users.add(new User( Integer.parseInt(values[0]),values[1],values[2],values[3],values[4],values[5],values[6])); // add a venue to the collection
         }        
     }
 
     private void writeToUsersFile(String path)
     {
-        StringBuffer stringBuf = new StringBuffer();
-        for(int i = 0; i< getUsers().size(); i++) // go through each driver in the collection
-        {
-            stringBuf.append(getUsers().get(i).getUserId() + "|" + getUsers().get(i).getFirstName() 
-                + "|" + getUsers().get(i).getLastName() + "|" + getUsers().get(i).getPhoneNumber()  
-                + "|" + getUsers().get(i).getEmail()  + "|" + getUsers().get(i).getPassword()  
-                + "|" + getUsers().get(i).getRole());
-        }
-        writeFile("users.txt",stringBuf.toString());
+        int lastIndex = getUsers().size() - 1;
+        String toWrite = getUsers().get(lastIndex).getUserId() + ";" + getUsers().get(lastIndex).getFirstName() 
+            + ";" + getUsers().get(lastIndex).getLastName() + ";" + getUsers().get(lastIndex).getPhoneNumber()  
+            + ";" + getUsers().get(lastIndex).getEmail()  + ";" + getUsers().get(lastIndex).getPassword()  
+            + ";" + getUsers().get(lastIndex).getRole();
+        writeFile(path, toWrite);
     }
 
     /**
@@ -166,13 +163,12 @@ public class EventController
         PrintWriter pw = null;
         try
         {
-            pw = new PrintWriter(fileName); // initialize a printwriter object to the file by its name
+            pw = new PrintWriter(new FileOutputStream(new File(fileName),true));
             String[] writeableContents = contents.split("\\n");
             for(int i = 0 ; i < writeableContents.length ; i++)
             {
                 pw.println(writeableContents[i]); // write contents to the file line by line
             }
-            System.out.println("Updated driver rankings saved to file at " + fileName);
         }
         catch(FileNotFoundException fileEx)
         {
@@ -261,6 +257,7 @@ public class EventController
 
     private void doLogin()
     {
+        readUsersFile();
         displayHeader("LOGIN");
         String email = acceptStringInput("Enter your email");
         String password = acceptStringInput("Enter your password");

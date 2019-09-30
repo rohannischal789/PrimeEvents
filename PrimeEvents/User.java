@@ -29,6 +29,7 @@ public class User
         email = "";
         password = "";
         role = "";
+        isLoggedIn = false;
     }
 
     public User(int newUserId, String newFirstName, String newLastName, 
@@ -41,6 +42,7 @@ public class User
         email = newEmail;
         password = newPassword;
         role = newRole;
+        isLoggedIn = false;
     }
     
     public int getUserId()

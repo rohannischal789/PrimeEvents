@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.io.*;
+import java.util.Collections;
+import java.util.Comparator;
 /**
  * Write a description of class EventController here.
  *
@@ -10,8 +12,6 @@ import java.io.*;
 public class EventController
 {
     // instance variables - replace the example below with your own
-    private boolean isLoggedIn;
-    private boolean isCustomer = true;
     private ArrayList<Hall> halls;
     private ArrayList<User> users;
     //private ArrayList<Owner> owners;
@@ -23,35 +23,72 @@ public class EventController
      */
     public EventController()
     {
-        // initialise instance variables
+        users = new ArrayList<User>();
+        halls = new ArrayList<Hall>();
     }
-    
+
+    public ArrayList<Hall> getHalls()
+    {
+        return halls;
+    }
+
+    public ArrayList<User> getUsers()
+    {
+        return users;
+    }
+
+    public int getMaxUserId()
+    {
+        if(getUsers().size() != 0)
+        {
+            Collections.sort(getUsers(), new Comparator<User>()
+                {
+                    public int compare(User u1, User u2) {
+                        return u2.getUserId() - u1.getUserId();
+                    }
+                });
+
+            return getUsers().get(0).getUserId();
+        }
+        else
+        {
+            return 1;
+        }
+    }
+
+    public void sortUserByLoginStatus()
+    {
+
+        Collections.sort(getUsers(), new Comparator<User>()
+            {
+                public int compare(User u1, User u2) {
+                    return Boolean.compare(u2.getIsLoggedIn(), u1.getIsLoggedIn());
+                }
+            });
+    }
+
+    public void addUser(String newFirstName, String newLastName, 
+    String newPhoneNo,String newEmail,String newPassword,String newRole)
+    {
+        getUsers().add(new User(getMaxUserId() + 1,newFirstName,newLastName,newPhoneNo,newEmail,newPassword,newRole));
+    }
+
+    public void setUsers(ArrayList<User> newUsers)
+    {
+        users = newUsers;
+    }
+
+    public void setHalls(ArrayList<Hall> newHalls)
+    {
+        halls = newHalls;
+    }    
+
     public void start()
     {
         displayHeader("PRIME EVENTS");
         showMenu();
     }
-    
-    public ArrayList<Hall> getHalls()
-    {
-        return halls;
-    }
-    
-    public ArrayList<User> getUsers()
-    {
-        return users;
-    }
-    
-    public void setUsers(ArrayList<User> newUsers)
-    {
-        users = newUsers;
-    }
-    
-    public void setHalls(ArrayList<Hall> newHalls)
-    {
-        halls = newHalls;
-    }    
-    
+
     private void readUsersFile()
     {
         String fileData = readFile("users.txt");
@@ -68,12 +105,14 @@ public class EventController
         StringBuffer stringBuf = new StringBuffer();
         for(int i = 0; i< getUsers().size(); i++) // go through each driver in the collection
         {
-            stringBuf.append(getDrivers().getDriver(i).getName() + "|" + getDrivers().getDriver(i).getRanking() 
-                + "|" + getDrivers().getDriver(i).getSpecialSkill() + ((i == (getDrivers().getSize() - 1)) ? "" :"\n")); // append details to buffer
+            stringBuf.append(getUsers().get(i).getUserId() + "|" + getUsers().get(i).getFirstName() 
+                + "|" + getUsers().get(i).getLastName() + "|" + getUsers().get(i).getPhoneNumber()  
+                + "|" + getUsers().get(i).getEmail()  + "|" + getUsers().get(i).getPassword()  
+                + "|" + getUsers().get(i).getRole());
         }
-        writeFile(stringBuf.toString());
+        writeFile("users.txt",stringBuf.toString());
     }
-    
+
     /**
      * Method readFile
      *
@@ -155,18 +194,68 @@ public class EventController
                 pw.close();
         }
     }
-    
+
     private void showMenu()
     {
-        int input = acceptIntegerInput("1. Login\n2. Registration\n3. Exit\nEnter your choice:");
-        switch(input)
+        boolean isValid = false;
+        while(!isValid)
         {
-            case 1: doLogin();
-            break;
-            case 2: registerUser();
-            break;
-            case 3: System.out.println("Exiting Prime Events. Bye!!"); 
-            break;
+            int input = acceptIntegerInput("1. Login\n2. Registration\n3. Exit\nEnter your choice:");
+            switch(input)
+            {
+                case 1: 
+                isValid = true;
+                doLogin();
+                break;
+                case 2: 
+                isValid = true;
+                registerUser();
+                break;
+                case 3:
+                isValid = true;
+                System.out.println("Exiting Prime Events. Bye!!"); 
+                break;
+                default:
+                System.out.println("Invalid choice. Please try again!\n");
+            }
+        }
+    }
+
+    private void registerUser()
+    {
+        boolean isValid = false;
+        while(!isValid)
+        {
+            displayHeader("REGISTRATION");
+            switch(acceptIntegerInput("1. Customer\n2. Owner\nEnter your choice:"))
+            {
+                case 1:
+                isValid = true;
+                String fname = acceptStringInput("Enter your first name");
+                String lname = acceptStringInput("Enter your last name");
+                String dob = acceptStringInput("Enter your date of birth (dd/MM/yyyy)");
+                String phone = acceptStringInput("Enter your phone no");
+                String isVet = acceptStringInput("Are you a veteran (Y/N)");
+                String email = acceptStringInput("Enter your email");
+                String password = acceptStringInput("Enter your password");
+                addUser(fname,lname,phone,email,password,"CUSTOMER");
+                System.out.println(fname + ", you've been successfully registered to Prime events. Kindly login to continue..");
+                doLogin();
+                break;
+                case 2:
+                isValid = true;
+                String firstname = acceptStringInput("Enter your first name");
+                String lastname = acceptStringInput("Enter your last name");
+                String phone1 = acceptStringInput("Enter your phone no");
+                String email1 = acceptStringInput("Enter your email");
+                String password1 = acceptStringInput("Enter your password");
+                addUser(firstname,lastname,phone1,email1,password1,"OWNER");
+                System.out.println(firstname + ", you've been successfully registered to Prime events as an Owner. Kindly login to continue..");
+                doLogin();
+                break;
+                default:
+                System.out.println("Invalid choice. Please try again");
+            }
         }
     }
 
@@ -175,15 +264,45 @@ public class EventController
         displayHeader("LOGIN");
         String email = acceptStringInput("Enter your email");
         String password = acceptStringInput("Enter your password");
-        System.out.println("Login Successful!!");
-        isLoggedIn = true;
-        showHome();
+        if(isValidCredentials(email,password))
+        {
+            System.out.println("Login Successful!!");
+            showHome();
+        }
+        else
+        {
+            doLogin();
+        }
+    }
+
+    private boolean isValidCredentials(String email, String password)
+    {
+        for(int i = 0; i < getUsers().size();i++)
+        {
+            if(getUsers().get(i).getEmail().equalsIgnoreCase(email))
+            {
+                if(getUsers().get(i).getPassword().equalsIgnoreCase(password))
+                {
+                    getUsers().get(i).setIsLoggedIn(true);
+                    return true;
+                }
+                else
+                {
+                    System.out.println("Incorrect password entered for the email. Please try again");
+                    return false;
+                }
+
+            }        
+        }
+        System.out.println("Email is not registered with prime events");
+        return false;
     }
 
     private void showHome()
     {
         displayHeader("HOME");
-        if(isCustomer)
+        sortUserByLoginStatus();
+        if(getUsers().get(0).getRole().equalsIgnoreCase("CUSTOMER"))
         {
             int input = acceptIntegerInput("1. Search Halls\n2. View Quotation Responses\n3. Manage Bookings\n4. Review Halls\n0. Logout\nEnter your choice:");
             switch(input)
@@ -343,7 +462,8 @@ public class EventController
         {
             case 'y':
             System.out.println("Successfully logged out!!");
-            isLoggedIn = false;
+            sortUserByLoginStatus();
+            getUsers().get(0).setIsLoggedIn(false);
             start();
             break;
             case 'n':
@@ -422,8 +542,11 @@ public class EventController
             case 3:
             acceptStringInput("Enter the event type to search");
             break;
+            default:
+            System.out.println("Invalid choice. Please try again!");
         }
-        if(isCustomer)
+        sortUserByLoginStatus();
+        if(getUsers().get(0).getRole().equalsIgnoreCase("CUSTOMER"))
         {
             searchHalls();
         }
@@ -431,69 +554,6 @@ public class EventController
         {
             chooseHall(false);
         }
-    }
-
-    // switch(filterInp)
-    // {
-    // case 1:break;
-    // case 2:break;
-    // case 3:break;
-    // }
-
-    private void registerUser()
-    {
-        displayHeader("REGISTRATION");
-        switch(acceptIntegerInput("1. Register as a new Customer\n2. Register as a new Owner\nEnter your choice:"))
-        {
-            case 1:
-            String fname = acceptStringInput("Enter your first name");
-            String lname = acceptStringInput("Enter your last name");
-            String dob = acceptStringInput("Enter your date of birth (dd/MM/yyyy)");
-            String phone = acceptStringInput("Enter your phone no");
-            String isVet = acceptStringInput("Are you a veteran (Y/N)");
-            String email = acceptStringInput("Enter your email");
-            String password = acceptStringInput("Enter your password");
-            System.out.println(fname + ", you've been successfully registered to Prime events. Kindly login to continue..");
-            isCustomer = true;
-            doLogin();
-            break;
-            case 2:
-            String firstname = acceptStringInput("Enter your first name");
-            String lastname = acceptStringInput("Enter your last name");
-            String phone1 = acceptStringInput("Enter your phone no");
-            String email1 = acceptStringInput("Enter your email");
-            String password1 = acceptStringInput("Enter your password");
-            System.out.println(firstname + ", you've been successfully registered to Prime events. Kindly login to continue..");
-            isCustomer = false;
-            doLogin();
-            break;
-        }
-    }
-
-    private void displayHeader(String header)
-    {
-        System.out.println("\n***********************************");
-        System.out.println("           " + header + "            ");
-        System.out.println("***********************************\n");   
-    }
-
-    private String acceptStringInput(String displayMessage)
-    {
-        Scanner console = new Scanner(System.in);
-        System.out.println(displayMessage);
-        return console.nextLine().trim();
-    }
-
-    private int acceptIntegerInput(String displayMessage)
-    {
-        Scanner console = new Scanner(System.in);
-        System.out.println(displayMessage);
-        while(!console.hasNextInt())
-        {
-            System.out.println("Incorrect Input!!\n " + displayMessage);
-            console.next();
-        }
-        return console.nextInt();
     }
 
     private void showQuotationResponse()
@@ -684,5 +744,37 @@ public class EventController
             break;
 
         }
+    }
+
+    private void displayHeader(String header)
+    {
+        System.out.println("\n***********************************");
+        System.out.println("           " + header + "            ");
+        System.out.println("***********************************\n");   
+    }
+
+    private String acceptStringInput(String displayMessage)
+    {
+        Scanner console = new Scanner(System.in);
+        System.out.println(displayMessage);
+        String input = console.nextLine().trim();
+        while(input.length() == 0)
+        {
+            System.out.println("Kindly enter a value");
+            input = console.nextLine();
+        }
+        return input;
+    }
+
+    private int acceptIntegerInput(String displayMessage)
+    {
+        Scanner console = new Scanner(System.in);
+        System.out.println(displayMessage);
+        while(!console.hasNextInt())
+        {
+            System.out.println("Incorrect Input!!\n " + displayMessage);
+            console.next();
+        }
+        return console.nextInt();
     }
 }

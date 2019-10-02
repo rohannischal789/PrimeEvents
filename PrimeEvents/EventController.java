@@ -1,8 +1,12 @@
+
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.io.*;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
+import java.text.SimpleDateFormat;  
+
 /**
  * Write a description of class EventController here.
  *
@@ -36,6 +40,16 @@ public class EventController
         return users;
     }
 
+    public void setUsers(ArrayList<User> newUsers)
+    {
+        users = newUsers;
+    }
+
+    public void setHalls(ArrayList<Hall> newHalls)
+    {
+        halls = newHalls;
+    }
+
     public Owner getOwnerById(int id)
     {
         for(int i = 0; i<getUsers().size();i++)
@@ -44,6 +58,20 @@ public class EventController
             {
                 User currentUser = getUsers().get(i);
                 return new Owner(currentUser.getUserId(),currentUser.getFirstName(),currentUser.getLastName(),
+                    currentUser.getPhoneNumber(),currentUser.getEmail(),currentUser.getPassword(),currentUser.getRole());      
+            }
+        }
+        return null;
+    }
+
+    public Customer getCustomerById(int id)
+    {
+        for(int i = 0; i<getUsers().size();i++)
+        {
+            if(getUsers().get(i).getUserId() == id)
+            {
+                User currentUser = getUsers().get(i);
+                return new Customer(currentUser.getUserId(),currentUser.getFirstName(),currentUser.getLastName(),
                     currentUser.getPhoneNumber(),currentUser.getEmail(),currentUser.getPassword(),currentUser.getRole());      
             }
         }
@@ -94,24 +122,38 @@ public class EventController
     public void addUser(String newFirstName, String newLastName, 
     String newPhoneNo,String newEmail,String newPassword,String newRole)
     {
-        getUsers().add(new User(getMaxUserId() + 1,newFirstName,newLastName,newPhoneNo,newEmail,newPassword,newRole));
-        writeToUsersFile("users.txt");
+        getUsers().add(new User(getMaxUserId() + 1,newFirstName,newLastName,newPhoneNo,newEmail,newPassword,newRole,false,0));
+        writeToUsersFile("users.txt",true,true);
     }
-
-    public void setUsers(ArrayList<User> newUsers)
-    {
-        users = newUsers;
-    }
-
-    public void setHalls(ArrayList<Hall> newHalls)
-    {
-        halls = newHalls;
-    }    
 
     public void start()
     {
         displayHeader("PRIME EVENTS");
         showMenu();
+    }
+
+    private void fetchQuotationData()
+    {
+        try
+        {
+            String fileData = readFile("quotations.txt");
+            String[] data = fileData.split("\\n"); // split data by new line character
+            for(Hall hall : halls)
+            {
+                hall.resetQuotations();
+            }
+            for(int i = 0 ; i < data.length ; i++)
+            {
+                String[] values = data[i].split(";");
+
+                getHallById(Integer.parseInt(values[0])).addQuotation(Integer.parseInt(values[1]),
+                    new SimpleDateFormat("dd/MM/yyyy").parse(values[2]),Integer.parseInt(values[3]),values[4],Boolean.parseBoolean(values[5]),
+                    values[6],Double.parseDouble(values[7]),values[8],getCustomerById(Integer.parseInt(values[9])));
+            }
+        }
+        catch(Exception e)
+        {
+        }
     }
 
     private void fetchHallsData()
@@ -132,6 +174,21 @@ public class EventController
         }
     }
 
+    private void fetchReviewData()
+    {
+        String fileData = readFile("reviews.txt");
+        String[] data = fileData.split("\\n"); // split data by new line character
+        for(Hall hall : halls)
+        {
+            hall.resetReviews();
+        }
+        for(int i = 0 ; i < data.length ; i++)
+        {
+            String[] values = data[i].split(";");
+            getHallById(Integer.parseInt(values[0])).addReview(values[1],getCustomerById(Integer.parseInt(values[2])),Integer.parseInt(values[3]));
+        }
+    }
+
     private void fetchUsersData()
     {
         String fileData = readFile("users.txt");
@@ -139,18 +196,34 @@ public class EventController
         for(int i = 0 ; i < data.length ; i++)
         {
             String[] values = data[i].split(";");            
-            users.add(new User( Integer.parseInt(values[0]),values[1],values[2],values[3],values[4],values[5],values[6]));
+            users.add(new User( Integer.parseInt(values[0]),values[1],values[2],values[3],values[4],values[5],values[6],
+                    Boolean.parseBoolean(values[7]),Integer.parseInt(values[8])));
         }        
     }
 
-    private void writeToUsersFile(String path)
+    private void writeToUsersFile(String path, boolean toAppend, boolean onlyUpdatedOnes)
     {
-        int lastIndex = getUsers().size() - 1;
-        String toWrite = getUsers().get(lastIndex).getUserId() + ";" + getUsers().get(lastIndex).getFirstName() 
-            + ";" + getUsers().get(lastIndex).getLastName() + ";" + getUsers().get(lastIndex).getPhoneNumber()  
-            + ";" + getUsers().get(lastIndex).getEmail()  + ";" + getUsers().get(lastIndex).getPassword()  
-            + ";" + getUsers().get(lastIndex).getRole();
-        writeFile(path, toWrite);
+        StringBuffer strBuf = new StringBuffer("");
+        if(onlyUpdatedOnes)
+        {
+            int lastIndex = getUsers().size() - 1;
+            strBuf.append(getUsers().get(lastIndex).getUserId() + ";" + getUsers().get(lastIndex).getFirstName() 
+                + ";" + getUsers().get(lastIndex).getLastName() + ";" + getUsers().get(lastIndex).getPhoneNumber()  
+                + ";" + getUsers().get(lastIndex).getEmail()  + ";" + getUsers().get(lastIndex).getPassword()  
+                + ";" + getUsers().get(lastIndex).getRole()+ ";" + getUsers().get(lastIndex).getIsLockedOut()+ ";" + getUsers().get(lastIndex).getInvalidLogoutAttempts());
+        }
+        else
+        {
+            for(int i = 0; i<getUsers().size(); i++)
+            {
+                strBuf.append(getUsers().get(i).getUserId() + ";" + getUsers().get(i).getFirstName() 
+                    + ";" + getUsers().get(i).getLastName() + ";" + getUsers().get(i).getPhoneNumber()  
+                    + ";" + getUsers().get(i).getEmail()  + ";" + getUsers().get(i).getPassword()  
+                    + ";" + getUsers().get(i).getRole()+ ";" + getUsers().get(i).getIsLockedOut()+ ";" + getUsers().get(i).getInvalidLogoutAttempts()+"\n");
+            }
+        }
+        writeFile(path, strBuf.toString(), toAppend);
+
     }
 
     /**
@@ -201,12 +274,12 @@ public class EventController
      *
      * @param contents The contents to write into the file. Each line end must be represented by \n character.
      */
-    public void writeFile(String fileName,String contents)
+    public void writeFile(String fileName,String contents,boolean toAppend)
     {
         PrintWriter pw = null;
         try
         {
-            pw = new PrintWriter(new FileOutputStream(new File(fileName),true));
+            pw = new PrintWriter(new FileOutputStream(new File(fileName),toAppend));
             String[] writeableContents = contents.split("\\n");
             for(int i = 0 ; i < writeableContents.length ; i++)
             {
@@ -300,6 +373,7 @@ public class EventController
 
     private void doLogin()
     {
+        users = new ArrayList<User>();
         fetchUsersData();
         displayHeader("LOGIN");
         String email = acceptStringInput("Enter your email");
@@ -321,14 +395,34 @@ public class EventController
         {
             if(getUsers().get(i).getEmail().equalsIgnoreCase(email))
             {
-                if(getUsers().get(i).getPassword().equalsIgnoreCase(password))
+                User currUser = getUsers().get(i);
+                if(currUser.getPassword().equalsIgnoreCase(password))
                 {
-                    getUsers().get(i).setIsLoggedIn(true);
-                    return true;
+                    if(!currUser.getIsLockedOut())
+                    {
+                        getUsers().get(i).setInvalidLogoutAttempts(0);
+                        getUsers().get(i).setIsLoggedIn(true);
+                        writeToUsersFile("users.txt",false,false);
+                        return true;
+                    }
+                    else
+                    {
+                        System.out.println("Account has locked for 3 previous failed attempts. Contact the administrator to unlock your account");
+                    }
                 }
                 else
-                {
-                    System.out.println("Incorrect password entered for the email. Please try again");
+                {        
+                    currUser.setInvalidLogoutAttempts(currUser.getInvalidLogoutAttempts() + 1);
+                    if(currUser.getInvalidLogoutAttempts() >= 3)
+                    {
+                        System.out.println("You've been locked out of your account for 3 consecutive failed attempts. Contact the administrator to unlock your account");
+                        currUser.setIsLockedOut(true);
+                    }
+                    else
+                    {
+                        System.out.println("Incorrect password entered for the email. Please try again");
+                    }  
+                    writeToUsersFile("users.txt",false,false);
                     return false;
                 }
 
@@ -340,7 +434,10 @@ public class EventController
 
     private void showHome()
     {
+        halls = new ArrayList<Hall>();
         fetchHallsData();
+        fetchReviewData();
+        fetchQuotationData();
         sortUserByLoginStatus();
         if(getUsers().get(0).getRole().equalsIgnoreCase("CUSTOMER"))
         {
@@ -351,7 +448,7 @@ public class EventController
                 int input = acceptIntegerInput("1. Search Halls\n2. View Quotation Responses\n3. Manage Bookings\n4. Review Halls\n0. Logout\nEnter your choice:");
                 switch(input)
                 {
-                    case 1: isValid = true; searchHalls(); break;
+                    case 1: isValid = true; searchHalls("",""); break;
                     case 2: isValid = true;showQuotationResponse(); break;
                     case 3: isValid = true;manageBooking(); break;
                     case 4: isValid = true;showReviewHall(); break;
@@ -388,7 +485,8 @@ public class EventController
         char input = acceptStringInput("Are you sure you want to log out(y/n)").toLowerCase().charAt(0);
         boolean isValid = false;
         while(!isValid)
-        {switch(input)
+        {
+            switch(input)
             {
                 case 'y':
                 isValid = true;
@@ -407,49 +505,111 @@ public class EventController
         }
     }
 
-    private void searchHalls()
+    private void searchHalls(String searchSuburb, String searchEventType)
     {
         displayHeader("SEARCH HALLS");
-        for(int i = 0; i < getHalls().size(); i++)
+        ArrayList<Hall> filteredHalls = filterHalls(searchSuburb, searchEventType);
+        for(int i = 0; i < filteredHalls.size(); i++)
         {
-            System.out.println(getHalls().get(i).displayShort() + "\n");
+            System.out.println(filteredHalls.get(i).displayShort());
         }
         System.out.println("\nOptions:");
-        String searchInput = acceptStringInput("Press number to view hall details"+
-                "\n----OR----\nF. Apply a Filter\nB. Go Back to Home\n0. Logout"+
-                "\nEnter your choice:");
+        boolean isValid = false;
+        while(!isValid)
+        {
+            String searchInput = acceptStringInput("Press number to view hall details"+
+                    "\n----OR----\nF. Apply a Filter\nR. Reset Filter\nB. Go Back to Home\n0. Logout"+
+                    "\nEnter your choice:");
 
-        if(isInteger(searchInput))
-        {
-            viewHallDetails(Integer.parseInt(searchInput));
-        }
-        else
-        {
-            char selectInput = searchInput.toLowerCase().charAt(0);
-            switch(selectInput)
+            if(isInteger(searchInput) && Integer.parseInt(searchInput) != 0)
             {
-                case 'f': applyFilter(); break;
-                case 'b': showHome(); break;
-                case '0': logout(); break;
+                isValid = true;
+                viewHallDetails(Integer.parseInt(searchInput));
+            }
+            else
+            {
+                char selectInput = searchInput.toLowerCase().charAt(0);
+                switch(selectInput)
+                {
+                    case 'f': isValid = true; applyFilter(); break;
+                    case 'r': isValid = true; searchHalls("",""); break;
+                    case 'b': isValid = true; showHome(); break;
+                    case '0': isValid = true; logout(); break;
+                    default:
+                    System.out.println("Invalid choice. Please try again");
+                }
             }
         }
     }
 
-    private boolean isInteger(String s)
+    private ArrayList<Hall> filterHalls(String searchSuburb, String searchEventType)
     {
-        try 
-        { 
-            Integer.parseInt(s); 
-        } 
-        catch(NumberFormatException e) 
-        { 
-            return false; 
-        }
-        catch(NullPointerException e) 
+        ArrayList<Hall> filteredHalls = new ArrayList<Hall>();
+        if(searchSuburb.length() == 0 && searchEventType.length() == 0)
         {
-            return false;
+            filteredHalls = getHalls();
         }
-        return true;
+        else
+        {
+            if(searchSuburb.length() > 0)
+            {
+                for(int i = 0 ; i < getHalls().size(); i++)
+                {
+                    if(getHalls().get(i).getSuburb().equalsIgnoreCase(searchSuburb))
+                    {
+                        filteredHalls.add(getHalls().get(i));
+                    }
+                }
+            }
+            else if(searchEventType.length() > 0)
+            {
+                for(int i = 0 ; i < getHalls().size(); i++)
+                {
+                    for(String str : getHalls().get(i).getEventTypes())
+                    {
+                        if(str.equalsIgnoreCase(searchEventType))
+                        {
+                            filteredHalls.add(getHalls().get(i));
+                        }
+                    }
+                }
+            }
+        }       
+        return filteredHalls;
+    }
+
+    private void applyFilter()
+    {
+        displayHeader("APPLY FILTER");
+        boolean isValid = false;
+        String searchSuburb = "";
+        String searchEvent = "";
+        while(!isValid)
+        {
+            int filterInp = acceptIntegerInput("1. Filter by Suburb\n2. Filter by Event Type\nEnter your choice:");
+            switch(filterInp)
+            {
+                case 1:
+                isValid = true;
+                searchSuburb = acceptStringInput("Enter the suburb name to search");
+                break;
+                case 2:
+                isValid = true;
+                searchEvent = acceptStringInput("Enter the event type to search");
+                break;
+                default:
+                System.out.println("Invalid choice. Please try again!");
+            }
+        }
+        sortUserByLoginStatus();
+        if(getUsers().get(0).getRole().equalsIgnoreCase("CUSTOMER"))
+        {
+            searchHalls(searchSuburb, searchEvent);
+        }
+        else
+        {
+            chooseHall(false);
+        }
     }
 
     private void viewHallDetails(int id)
@@ -459,18 +619,24 @@ public class EventController
         if(viewableHall == null)
         {
             System.out.println("Invalid Hall ID entered. Please try again!");
-            searchHalls();
+            searchHalls("","");
         }
         else
         {
             System.out.println(viewableHall.displayLong());
-            char input = acceptStringInput("\nQ. Request Quotation\nR. View Reviews\nB. Go Back to Search Halls\nEnter your choice:")
-                .toLowerCase().charAt(0);
-            switch(input)
+            boolean isValid = false;
+            while(!isValid)
             {
-                case 'q': requestQuotation(); break;
-                case 'r': showReviews(); break;
-                case 'b': searchHalls(); break;
+                char input = acceptStringInput("\nQ. Request Quotation\nR. View Reviews\nB. Go Back to Search Halls\nEnter your choice:")
+                    .toLowerCase().charAt(0);
+                switch(input)
+                {
+                    case 'q': isValid = true; requestQuotation(); break;
+                    case 'r': isValid = true; showReviews(viewableHall); break;
+                    case 'b': isValid = true; searchHalls("",""); break;
+                    default:
+                    System.out.println("Invalid choice. Please try again!");
+                }
             }
         }
     }
@@ -484,45 +650,32 @@ public class EventController
         String phone = acceptStringInput("Do you require Catering by us(y/n):");
         String isVet = acceptStringInput("Any special requirements:");
         System.out.println("Your quotation request has been sent to the owner. Once the owner responds, you can use the View Quotation Responses option to view it!");
-        searchHalls();
+        searchHalls("","");
     }
 
-    private void showReviews()
+    private void showReviews(Hall viewableHall)
     {
         displayHeader("VIEW REVIEWS");
-        System.out.println("Name: Hall 17\nSuburb: Clayton\n\nReviews:"+
-            "\nIt is a spacious hall with plenty of sitting. 5 stars.\n\nGreat hall in the heart of Clayton. 4 stars.");
-        char goBack = acceptStringInput("\nB. Go Back to View Hall\nEnter your choice:").charAt(0);
-        //viewHallDetails();
-    }
-
-    private void applyFilter()
-    {
-        displayHeader("APPLY FILTER");
-        int filterInp = acceptIntegerInput("1. Filter by Suburb\n2. Filter by Available Date"+
-                "\n3. Filter by Event Type\nEnter your choice:");
-        switch(filterInp)
+        if(viewableHall!=null)
         {
-            case 1:
-            acceptStringInput("Enter the suburb name to search");
-            break;
-            case 2:
-            acceptStringInput("Enter the available date to search (dd/MM/yyyy)");
-            break;
-            case 3:
-            acceptStringInput("Enter the event type to search");
-            break;
-            default:
-            System.out.println("Invalid choice. Please try again!");
-        }
-        sortUserByLoginStatus();
-        if(getUsers().get(0).getRole().equalsIgnoreCase("CUSTOMER"))
-        {
-            searchHalls();
+            System.out.println(viewableHall.displayShort());
+            System.out.println("REVIEWS:");
+            System.out.println(viewableHall.getAllReviews());
         }
         else
         {
-            chooseHall(false);
+            System.out.println("There are no reviews currently for the hall");
+        }
+        boolean isValid = false;
+        while(!isValid)
+        {
+            char goBack = acceptStringInput("\nB. Go Back\nEnter your choice:").toLowerCase().charAt(0);
+            switch(goBack)
+            {
+                case 'b': isValid = true; viewHallDetails(viewableHall.getHallId()); break;
+                default:
+                System.out.println("Invalid choice. Please try again!");
+            }
         }
     }
 
@@ -867,9 +1020,26 @@ public class EventController
         System.out.println(displayMessage);
         while(!console.hasNextInt())
         {
-            System.out.println("Incorrect Input!!\n" + displayMessage);
+            System.out.println("Invalid Input. Please try again!\n" + displayMessage);
             console.next();
         }
         return console.nextInt();
+    }
+
+    private boolean isInteger(String s)
+    {
+        try 
+        { 
+            Integer.parseInt(s); 
+        } 
+        catch(NumberFormatException e) 
+        { 
+            return false; 
+        }
+        catch(NullPointerException e) 
+        {
+            return false;
+        }
+        return true;
     }
 }

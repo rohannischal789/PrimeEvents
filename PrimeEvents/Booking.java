@@ -12,6 +12,7 @@ public class Booking
     private Date endDateTime;
     private String status;
     private Payment payment;
+    private Quotation quotation;
     
     /**
      * Constructor for objects of class Booking

@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Date;
 /**
  * Write a description of class Hall here.
  *
@@ -222,6 +223,16 @@ public class Hall
     {
         this.quotations = quotations;
     }
+    
+    public void resetReviews() 
+    {
+        this.reviews = new ArrayList<Review>();
+    }
+    
+     public void resetQuotations() 
+    {
+        this.quotations = new ArrayList<Quotation>();
+    }
 
     /**
      * Returns value of reviews
@@ -289,4 +300,29 @@ public class Hall
         }
         return toReturn;            
     }
+    
+    public String getAllReviews()
+    {
+        String toReturn = "";
+        for(int i = 0 ; i < reviews.size(); i++)
+        {
+            toReturn += reviews.get(i).getRating() + " stars | " + reviews.get(i).getReview() + " | Customer name: " 
+                        + reviews.get(i).getCustomer().getFirstName() + " " + reviews.get(i).getCustomer().getLastName() + " |\n\n";
+        }
+        return toReturn;            
+    }
+    
+    public void addReview(String newReview, Customer newCustomer,int newRating)
+    {
+        getReviews().add(new Review(newReview, newCustomer, newRating));
+    }
+    
+    public void addQuotation(int quotationId, Date eventDate, int numberOfAttendees,String eventType,
+    boolean requiresCatering, String specialRequirements, double finalPrice, String quotationStatus,
+    Customer customer)
+    {
+        getQuotations().add(new Quotation( quotationId, eventDate, numberOfAttendees,eventType,
+    requiresCatering, specialRequirements,finalPrice, quotationStatus,customer));
+    }
+    
 }

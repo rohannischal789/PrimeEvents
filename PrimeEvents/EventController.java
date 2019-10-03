@@ -5,7 +5,8 @@ import java.io.*;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.text.SimpleDateFormat;  
+import java.text.SimpleDateFormat;
+import java.text.ParseException;  
 
 /**
  * Write a description of class EventController here.
@@ -17,6 +18,9 @@ public class EventController
 {
     private ArrayList<Hall> halls;
     private ArrayList<User> users;
+    private ArrayList<Quotation> quotations;
+    private ArrayList<Booking> bookings;
+
     //private ArrayList<Owner> owners;
     //private ArrayList<Customer> customers;
     //private ArrayList<Admin> admins;
@@ -40,6 +44,26 @@ public class EventController
         return users;
     }
 
+    public ArrayList<Quotation> getQuotations()
+    {
+        return quotations;
+    }
+
+    public ArrayList<Booking> getBookings()
+    {
+        return bookings;
+    }
+
+    public void setQuotations(ArrayList<Quotation> newQuotations)
+    {
+        quotations = newQuotations;
+    }
+
+    public void setBookings(ArrayList<Booking> newBookings)
+    {
+        bookings = newBookings;
+    }
+
     public void setUsers(ArrayList<User> newUsers)
     {
         users = newUsers;
@@ -60,6 +84,15 @@ public class EventController
                 return new Owner(currentUser.getUserId(),currentUser.getFirstName(),currentUser.getLastName(),
                     currentUser.getPhoneNumber(),currentUser.getEmail(),currentUser.getPassword(),currentUser.getRole());      
             }
+        }
+        return null;
+    }
+
+    public Customer getQuotationsByCustomerId(int id)
+    {
+        for(Hall hall: halls)
+        {
+            hall.getQuotations();
         }
         return null;
     }
@@ -105,7 +138,7 @@ public class EventController
         }
         else
         {
-            return 1;
+            return 0;
         }
     }
 
@@ -147,8 +180,9 @@ public class EventController
                 String[] values = data[i].split(";");
 
                 getHallById(Integer.parseInt(values[0])).addQuotation(Integer.parseInt(values[1]),
-                    new SimpleDateFormat("dd/MM/yyyy").parse(values[2]),Integer.parseInt(values[3]),values[4],Boolean.parseBoolean(values[5]),
-                    values[6],Double.parseDouble(values[7]),values[8],getCustomerById(Integer.parseInt(values[9])));
+                    new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(values[2]),
+                    new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(values[3]),Integer.parseInt(values[4]),values[5],Boolean.parseBoolean(values[6]),
+                    values[7],Double.parseDouble(values[8]),values[9],getCustomerById(Integer.parseInt(values[10])),Integer.parseInt(values[0]));
             }
         }
         catch(Exception e)
@@ -199,6 +233,32 @@ public class EventController
             users.add(new User( Integer.parseInt(values[0]),values[1],values[2],values[3],values[4],values[5],values[6],
                     Boolean.parseBoolean(values[7]),Integer.parseInt(values[8])));
         }        
+    }
+
+    private void writeToQuotationsFile(String path, boolean toAppend, boolean onlyUpdatedOnes)
+    {
+        StringBuffer strBuf = new StringBuffer("");
+        if(onlyUpdatedOnes)
+        {
+            int lastIndex = getUsers().size() - 1;
+            strBuf.append(getQuotations().get(lastIndex).getHallId() + ";"+ getQuotations().get(lastIndex).getQuotationId() + ";" + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(getQuotations().get(lastIndex).getStartEventDateTime()) 
+                + ";" + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(getQuotations().get(lastIndex).getEndEventDateTime()) + ";" + getQuotations().get(lastIndex).getEventType()  
+                + ";" + (getQuotations().get(lastIndex).getRequiresCatering() == true ? "y" : "n") + ";" + getQuotations().get(lastIndex).getSpecialRequirements()  
+                + ";" + getQuotations().get(lastIndex).getFinalPrice()+ ";" + getQuotations().get(lastIndex).getQuotationStatus()+ ";" + getQuotations().get(lastIndex).getCustomer().getUserId()
+                +"\n");
+        }
+        else
+        {
+            for(int i = 0; i < getQuotations().size(); i++)
+            {
+                strBuf.append(getQuotations().get(i).getHallId() + ";"+ getQuotations().get(i).getQuotationId() + ";" + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(getQuotations().get(i).getStartEventDateTime()) 
+                    + ";" + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(getQuotations().get(i).getEndEventDateTime()) + ";" + getQuotations().get(i).getEventType()  
+                    + ";" + (getQuotations().get(i).getRequiresCatering() == true ? "y" : "n") + ";" + getQuotations().get(i).getSpecialRequirements()  
+                    + ";" + getQuotations().get(i).getFinalPrice()+ ";" + getQuotations().get(i).getQuotationStatus()+ ";" + getQuotations().get(i).getCustomer().getUserId()
+                    +"\n");
+            }
+        }
+        writeFile(path, strBuf.toString(), toAppend);
     }
 
     private void writeToUsersFile(String path, boolean toAppend, boolean onlyUpdatedOnes)
@@ -439,6 +499,7 @@ public class EventController
         fetchReviewData();
         fetchQuotationData();
         sortUserByLoginStatus();
+        int userId = getUsers().get(0).getUserId();
         if(getUsers().get(0).getRole().equalsIgnoreCase("CUSTOMER"))
         {
             displayHeader("HOME - CUSTOMER");
@@ -449,7 +510,7 @@ public class EventController
                 switch(input)
                 {
                     case 1: isValid = true; searchHalls("",""); break;
-                    case 2: isValid = true;showQuotationResponse(); break;
+                    case 2: isValid = true;showQuotationResponse(userId); break;
                     case 3: isValid = true;manageBooking(); break;
                     case 4: isValid = true;showReviewHall(); break;
                     case 0: isValid = true;logout(); break;
@@ -631,7 +692,7 @@ public class EventController
                     .toLowerCase().charAt(0);
                 switch(input)
                 {
-                    case 'q': isValid = true; requestQuotation(); break;
+                    case 'q': isValid = true; requestQuotation(viewableHall); break;
                     case 'r': isValid = true; showReviews(viewableHall); break;
                     case 'b': isValid = true; searchHalls("",""); break;
                     default:
@@ -641,16 +702,55 @@ public class EventController
         }
     }
 
-    private void requestQuotation()
+    private void requestQuotation(Hall selectedHall)
     {
         displayHeader("REQUEST QUOTATION");
-        String fname = acceptStringInput("Enter Event Date (dd/MM/yyyy)");
-        String lname = acceptStringInput("Enter total number of attendees");
-        String dob = acceptStringInput("Enter your event type (Wedding ceremony, Wedding reception, Birthday, Anniversary)");
-        String phone = acceptStringInput("Do you require Catering by us(y/n):");
-        String isVet = acceptStringInput("Any special requirements:");
+        String inpEventDate = acceptStringInput("Enter Event Start Date Time (dd/MM/yyyy HH:mm)");
+        boolean isValid = false;
+        Date startEventDate = new Date();
+        while(!isValid)
+        {
+            try
+            {
+                startEventDate = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(inpEventDate);
+                isValid = true;
+            }
+            catch(ParseException ex)
+            {
+
+            }
+        }
+        String inpEndEventDate = acceptStringInput("Enter Event End Date Time (dd/MM/yyyy HH:mm)");
+        isValid = false;
+        Date endEventDate = new Date();
+        while(!isValid)
+        {
+            try
+            {
+                endEventDate = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(inpEndEventDate);
+                isValid = true;
+            }
+            catch(ParseException ex)
+            {
+
+            }
+        }
+        int noOfAttendees = acceptIntegerInput("Enter total number of attendees");
+        String eventType = acceptStringInput("Enter your event type (Wedding ceremony, Wedding reception, Birthday, Anniversary)");
+        char requiresCatering = acceptStringInput("Do you require Catering by us(y/n):").toLowerCase().charAt(0);
+        String specialReq = acceptStringInput("Any special requirements:");
+        Double finalPrice = calculatePrice();
+        System.out.println("Total Price: " + finalPrice);
+        selectedHall.addQuotation(1,startEventDate,endEventDate,noOfAttendees,eventType, requiresCatering == 'y' ? true : false,specialReq,
+            finalPrice,"PENDING",getCustomerById(getUsers().get(0).getUserId()),selectedHall.getHallId());
+        writeToQuotationsFile("quotations.txt",true,true);
         System.out.println("Your quotation request has been sent to the owner. Once the owner responds, you can use the View Quotation Responses option to view it!");
         searchHalls("","");
+    }
+
+    private double calculatePrice()
+    {
+        return 1000;
     }
 
     private void showReviews(Hall viewableHall)
@@ -679,66 +779,104 @@ public class EventController
         }
     }
 
-    private void showQuotationResponse()
+    private void showQuotationResponse(int customerId)
     {
         displayHeader("QUOTATION RESPONSES");
-        System.out.println("1. Hall 17, Clayton - Accepted\n2. Hall 2, Oakleigh - Rejected");
-        char choice = acceptStringInput("\nEnter number to view accepted quotation and pay deposit"+
-                "\n----OR-----\nB. Go back to Home\nEnter your choice:").charAt(0);
-        switch(choice)
+        for(Hall hall : halls)
         {
-            case '1':viewQuotationDetails(); break;
-            case 'b':showHome(); break;
+            String abc = hall.getCustomerQuotationResponses(customerId);
+            if(!hall.getCustomerQuotationResponses(customerId).equals(""))
+                System.out.println(hall.getCustomerQuotationResponses(customerId));
+        }
+        boolean isValid = false;
+        while(!isValid)
+        {
+            String choice = acceptStringInput("\nEnter number to view accepted quotation and pay deposit"+
+                    "\n----OR-----\nB. Go back to Home\nEnter your choice:").toLowerCase();
+            if(isInteger(choice) && Integer.parseInt(choice) != 0)
+            {
+                isValid = true;
+                viewQuotationDetails(customerId ,Integer.parseInt(choice));
+            }
+            else
+            {
+                char selectInput = choice.toLowerCase().charAt(0);
+                switch(selectInput)
+                {
+                    case 'b': isValid = true; showHome(); break;
+                    default:
+                    System.out.println("Invalid choice. Please try again!");
+                }
+            }
         }
     }
 
-    private void viewQuotationDetails()
+    private void viewQuotationDetails(int customerId, int quotationId)
     {
         displayHeader("QUOTATION DETAILS");
-        System.out.println("Name: Hall 17\nSuburb: Clayton\nAddress: 17, Clayton Road, Clayton" +
-            "\nCapacity: 300\nDeposit: 50%\nEvent Type: Birthday\nPrice: $1000"+
-            "\nEvent Date: 12/09/2019\nTotal number of attendees: 150\nCatering required: Yes"+
-            "\nAny special requirements: Require Vegan food options\nStatus: Accepted\nDeposit Paid: No");
-        char choice = acceptStringInput("\n1. Pay deposit\nB. Go Back to Quotation Responses\nEnter your choice:").charAt(0);
-        switch(choice)
+        for(Hall hall : halls)
         {
-            case '1':payDeposit(); break;
-            case 'b':showQuotationResponse(); break;
+            if(hall.getCustomerQuotationDetails(customerId, quotationId) != null)
+                System.out.println(hall.getCustomerQuotationDetails(customerId, quotationId) );
+        }
+        boolean isValid = false;
+        while(!isValid)
+        {
+            char choice = acceptStringInput("\n1. Pay deposit\nB. Go Back to Quotation Responses\nEnter your choice:").charAt(0);
+            switch(choice)
+            {
+                case '1': isValid = true; payDeposit(customerId,quotationId); break;
+                case 'b': isValid = true; showQuotationResponse(customerId); break;
+                default:
+                System.out.println("Invalid choice. Please try again!");
+            }
         }
     }
 
-    private void payDeposit()
+    private void payDeposit(int customerId, int quotationId)
     {
         displayHeader("PAY DEPOSIT");
-        System.out.println("Name: Hall 17\nSuburb: Clayton\nDeposit: 50%"+
-            "\nPrice: $1000\nEvent Date: 12/09/2019");
-        char choice = acceptStringInput("1. Pay by Cash\n2. Pay by Card\nB. Go back to Quotation Responses\nEnter your choice:").charAt(0);
-        switch(choice)
+        for(Hall hall : halls)
         {
-            case '1':
-            char accept = acceptStringInput("Do you accept charges of $500 for the booking(y/n)?").charAt(0);
-            switch(accept)
+            if(hall.getCustomerQuotationDetails(customerId, quotationId) != null)
+                System.out.println(hall.getCustomerQuotationDetails(customerId, quotationId) );
+        }
+        boolean isValid = false;
+        while(!isValid)
+        {
+            char choice = acceptStringInput("1. Pay by Cash\n2. Pay by Card\nB. Go back to Quotation Responses\nEnter your choice:").charAt(0);
+            switch(choice)
             {
-                case 'y':
-                System.out.println("Pay deposit accepted!! Booking successful.");
-                viewReceipt();
+                case '1':
+                char accept = acceptStringInput("Do you accept the charges for the booking(y/n)?").charAt(0);
+                switch(accept)
+                {
+                    case 'y':
+                    System.out.println("Pay deposit accepted!! Booking successful.");
+                    viewReceipt(customerId);
+                    break;
+                    case 'n':
+                    System.out.println("Pay deposit cancelled!! Going back to Quotation details");
+                    viewQuotationDetails(customerId, quotationId);
+                    break;
+                }
                 break;
-                case 'n':
-                System.out.println("Pay deposit cancelled!! Going back to Quotation details");
-                viewQuotationDetails();
+                case '2':
+                // do card payment
+                break;
+                case 'b':
+                showQuotationResponse(customerId);
                 break;
             }
-            break;
-            case '2':
-            // do card payment
-            break;
-            case 'b':
-            showQuotationResponse();
-            break;
         }
     }
 
-    private void viewReceipt()
+    private void processCardPayment()
+    {
+
+    }
+
+    private void viewReceipt(int customerId)
     {
         displayHeader("VIEW RECEIPT");
         System.out.println("Name: Hall 17\nSuburb: Clayton\nAddress: 17, Clayton Road, Clayton\nDeposit: 50%\nEvent Type: Birthday\nPrice: $1000\n"+
@@ -747,7 +885,7 @@ public class EventController
         switch(accept)
         {
             case 'b':
-            showQuotationResponse();
+            showQuotationResponse(customerId);
             break;
         }
     }

@@ -11,6 +11,7 @@ public class Discount
     private int discountPercentage;
     private Date startDate;
     private Date endDate;
+    private User user;
     /**
      * Constructor for objects of class Discount
      */

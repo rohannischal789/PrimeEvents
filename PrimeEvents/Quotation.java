@@ -10,13 +10,15 @@ public class Quotation
 {
     // instance variables - replace the example below with your own
     private int quotationId;
-    private Date eventDate;
+    private Date startEventDateTime;
+    private Date endEventDateTime;
     private int numberOfAttendees;
     private String eventType;
     private boolean requiresCatering;
     private String specialRequirements;
     private double finalPrice;
     private String quotationStatus;
+    private int hallId;
     private Customer customer;
 
     /**
@@ -28,12 +30,13 @@ public class Quotation
 
     }
 
-    public Quotation(int quotationId, Date eventDate, int numberOfAttendees,String eventType,
+    public Quotation(int quotationId, Date startEventDateTime, Date endEventDateTime, int numberOfAttendees,String eventType,
     boolean requiresCatering, String specialRequirements, double finalPrice, String quotationStatus,
-    Customer customer)
+    Customer customer, int hallId)
     {
         this.quotationId = quotationId;
-        this.eventDate = eventDate;
+        this.startEventDateTime = startEventDateTime;
+        this.endEventDateTime = endEventDateTime;
         this.numberOfAttendees = numberOfAttendees;
         this.eventType = eventType;
         this.requiresCatering = requiresCatering;
@@ -41,6 +44,7 @@ public class Quotation
         this.finalPrice = finalPrice;
         this.quotationStatus = quotationStatus;
         this.customer = customer;
+        this.hallId = hallId;
     }
 
     /**
@@ -62,19 +66,35 @@ public class Quotation
     }
 
     /**
-     * Returns value of eventDate
+     * Returns value of startEventDateTime
      * @return
      */
-    public Date getEventDate() {
-        return eventDate;
+    public Date getStartEventDateTime() {
+        return startEventDateTime;
     }
 
     /**
-     * Sets new value of eventDate
+     * Sets new value of startEventDateTime
      * @param
      */
-    public void setEventDate(Date eventDate) {
-        this.eventDate = eventDate;
+    public void setStartEventDateTime(Date startEventDateTime) {
+        this.startEventDateTime = startEventDateTime;
+    }
+
+    /**
+     * Returns value of endEventDateTime
+     * @return
+     */
+    public Date getEndEventDateTime() {
+        return endEventDateTime;
+    }
+
+    /**
+     * Sets new value of endEventDateTime
+     * @param
+     */
+    public void setEndEventDateTime(Date endEventDateTime) {
+        this.endEventDateTime = endEventDateTime;
     }
 
     /**
@@ -113,7 +133,7 @@ public class Quotation
      * Returns value of requiresCatering
      * @return
      */
-    public boolean isRequiresCatering() {
+    public boolean getRequiresCatering() {
         return requiresCatering;
     }
 
@@ -187,6 +207,20 @@ public class Quotation
      */
     public void setCustomer(Customer customer) {
         this.customer = customer;
+    }
+
+    public int getHallId()
+    {
+        return hallId;
+    }
+
+    /**
+     * Sets new value of quotationId
+     * @param
+     */
+    public void setHallId(int hallId) 
+    {
+        this.hallId = hallId;
     }
 
 }

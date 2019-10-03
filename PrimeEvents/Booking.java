@@ -8,8 +8,6 @@ import java.util.Date;
 public class Booking
 {
     // instance variables - replace the example below with your own
-    private Date startDateTime;
-    private Date endDateTime;
     private String status;
     private Payment payment;
     private Quotation quotation;

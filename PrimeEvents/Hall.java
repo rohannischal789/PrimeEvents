@@ -324,15 +324,8 @@ public class Hall
         getQuotations().add(new Quotation( quotationId, startEventDateTime, endEventDateTime, numberOfAttendees,eventType,
                 requiresCatering, specialRequirements,finalPrice, quotationStatus,customer, hallId));
     }
-    
-    public void addBooking(int quotationId, Date startEventDateTime, Date endEventDateTime,  int numberOfAttendees,String eventType,
-    boolean requiresCatering, String specialRequirements, double finalPrice, String quotationStatus,
-    Customer customer, int hallId)
-    {
-        
-    }
 
-    private ArrayList<Quotation> getQuotationByCustomerId(int customerId)
+    public ArrayList<Quotation> getQuotationByCustomerId(int customerId)
     {
         ArrayList<Quotation> quotationList = new ArrayList<Quotation>();
         for(Quotation quotation: getQuotations())
@@ -395,6 +388,19 @@ public class Hall
         {
             return null;
         }
+    }
+
+    public Quotation getQuotationById(int id)
+    {
+        for(Quotation quotation : getQuotations())
+        {
+            if(quotation.getQuotationId() == id)
+            {
+                return quotation;
+            }
+        }
+
+        return null;
     }
 
 }

@@ -88,15 +88,6 @@ public class EventController
         return null;
     }
 
-    public Customer getQuotationsByCustomerId(int id)
-    {
-        for(Hall hall: halls)
-        {
-            hall.getQuotations();
-        }
-        return null;
-    }
-
     public Customer getCustomerById(int id)
     {
         for(int i = 0; i<getUsers().size();i++)
@@ -163,6 +154,26 @@ public class EventController
     {
         displayHeader("PRIME EVENTS");
         showMenu();
+    }
+
+    private void fetchBookingAndPaymentData()
+    {
+        try
+        {
+            String fileData = readFile("bookings_payments.txt");
+            String[] data = fileData.split("\\n"); // split data by new line character
+            for(int i = 0 ; i < data.length ; i++)
+            {
+                String[] values = data[i].split(";");
+
+                Quotation currQuotation = getHallById(Integer.parseInt(values[0])).getQuotationById(Integer.parseInt(values[7]));
+                Payment payment = new Payment(values[2], Double.parseDouble(values[3]),Double.parseDouble(values[4]),values[5],values[6]);
+                Booking booking = new Booking(values[1],payment,currQuotation);
+            }
+        }
+        catch(Exception e)
+        {
+        }
     }
 
     private void fetchQuotationData()
@@ -233,6 +244,34 @@ public class EventController
             users.add(new User( Integer.parseInt(values[0]),values[1],values[2],values[3],values[4],values[5],values[6],
                     Boolean.parseBoolean(values[7]),Integer.parseInt(values[8])));
         }        
+    }
+
+    private void writeToBookingsAndPaymentsFile(String path, boolean toAppend, boolean onlyUpdatedOnes)
+    {
+        StringBuffer strBuf = new StringBuffer("");
+        if(onlyUpdatedOnes)
+        {
+            int lastIndex = getUsers().size() - 1;
+            strBuf.append(getBookings().get(lastIndex).getStatus() 
+                + ";" + getBookings().get(lastIndex).getPayment().getReceiptNo() + ";" + getBookings().get(lastIndex).getPayment().getDepositAmount()
+                + ";" + getBookings().get(lastIndex).getPayment().getBalanceAmount() + ";" + getBookings().get(lastIndex).getPayment().getPaymentType()
+                + ";" + getBookings().get(lastIndex).getPayment().getPaymentStatus()
+                + ";" + getBookings().get(lastIndex).getQuotation().getQuotationId()
+                +"\n");
+        }
+        else
+        {
+            for(int i = 0; i < getQuotations().size(); i++)
+            {
+                strBuf.append( getBookings().get(i).getStatus() 
+                    + ";" + getBookings().get(i).getPayment().getReceiptNo() + ";" + getBookings().get(i).getPayment().getDepositAmount()
+                    + ";" + getBookings().get(i).getPayment().getBalanceAmount() + ";" + getBookings().get(i).getPayment().getPaymentType()
+                    + ";" + getBookings().get(i).getPayment().getPaymentStatus()
+                    + ";" + getBookings().get(i).getQuotation().getQuotationId()
+                    +"\n");
+            }
+        }
+        writeFile(path, strBuf.toString(), toAppend);
     }
 
     private void writeToQuotationsFile(String path, boolean toAppend, boolean onlyUpdatedOnes)
@@ -498,6 +537,7 @@ public class EventController
         fetchHallsData();
         fetchReviewData();
         fetchQuotationData();
+        fetchBookingAndPaymentData();
         sortUserByLoginStatus();
         int userId = getUsers().get(0).getUserId();
         if(getUsers().get(0).getRole().equalsIgnoreCase("CUSTOMER"))
@@ -844,36 +884,82 @@ public class EventController
         boolean isValid = false;
         while(!isValid)
         {
-            char choice = acceptStringInput("1. Pay by Cash\n2. Pay by Card\nB. Go back to Quotation Responses\nEnter your choice:").charAt(0);
+            char choice = acceptStringInput("\n1. Pay by Cash\n2. Pay by Card\nB. Go back to Quotation Responses\nEnter your choice:").charAt(0);
             switch(choice)
             {
                 case '1':
-                char accept = acceptStringInput("Do you accept the charges for the booking(y/n)?").charAt(0);
+                char accept = acceptStringInput("Do you accept the mentioned charges for the booking by cash(y/n)?").charAt(0);
                 switch(accept)
                 {
                     case 'y':
+                    isValid = true;
+                    makeBooking(customerId, quotationId, "CASH");
                     System.out.println("Pay deposit accepted!! Booking successful.");
                     viewReceipt(customerId);
                     break;
                     case 'n':
+                    isValid = true;
                     System.out.println("Pay deposit cancelled!! Going back to Quotation details");
                     viewQuotationDetails(customerId, quotationId);
                     break;
+                    default:
+                    System.out.println("Invalid choice. Please try again!");
                 }
                 break;
                 case '2':
-                // do card payment
+                String cardNumber = acceptStringInput("Enter the card number");
+                String cardExpiry = acceptStringInput("Enter the card expiry date");
+                String cvv = acceptStringInput("Enter the 3 digit CVV");
+                char cardAccept = acceptStringInput("Do you accept the mentioned charges for the booking by card(y/n)?").charAt(0);
+                switch(cardAccept)
+                {
+                    case 'y':
+                    isValid = true;
+                    makeBooking(customerId, quotationId, "CASH");
+                    System.out.println("Pay deposit accepted!! Booking successful.");
+                    viewReceipt(customerId);
+                    break;
+                    case 'n':
+                    isValid = true;
+                    System.out.println("Pay deposit cancelled!! Going back to Quotation details");
+                    viewQuotationDetails(customerId, quotationId);
+                    break;
+                    default:
+                    System.out.println("Invalid choice. Please try again!");
+                }
                 break;
                 case 'b':
-                showQuotationResponse(customerId);
+                isValid = true;
+                viewQuotationDetails(customerId, quotationId);
                 break;
+                default:
+                System.out.println("Invalid choice. Please try again!");
             }
         }
     }
 
-    private void processCardPayment()
+    private void makeBooking(int customerId, int quotationId, String paymentType )
     {
-
+        Quotation currQuotation = null;
+        Hall currHall = null;
+        for(Hall hall : getHalls())
+        {
+            for(Quotation quotation : hall.getQuotationByCustomerId(customerId))
+            {
+                if(quotation.getQuotationId() == quotationId) 
+                {
+                    currQuotation = quotation;
+                    currHall = hall;
+                }
+            }
+        }
+        double depositAmount = currQuotation.getFinalPrice()*(currHall.getDeposit()/100);
+        double balanceAmount = currQuotation.getFinalPrice() - depositAmount;
+        String receiptNo = new SimpleDateFormat("ddMMyyyyHHmmss").format(System.currentTimeMillis());
+        receiptNo += customerId;
+        Payment payment = new Payment(receiptNo,depositAmount, balanceAmount,paymentType,"PARTIAL");
+        Booking booking = new Booking("UPCOMING",payment,currQuotation);
+        writeToBookingsAndPaymentsFile("bookings_payments.txt",true,true);
     }
 
     private void viewReceipt(int customerId)

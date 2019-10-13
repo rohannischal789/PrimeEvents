@@ -18,7 +18,6 @@ public class EventController
 {
     private ArrayList<Hall> halls;
     private ArrayList<User> users;
-    private ArrayList<Quotation> quotations;
     private ArrayList<Booking> bookings;
 
     //private ArrayList<Owner> owners;
@@ -44,19 +43,9 @@ public class EventController
         return users;
     }
 
-    public ArrayList<Quotation> getQuotations()
-    {
-        return quotations;
-    }
-
     public ArrayList<Booking> getBookings()
     {
         return bookings;
-    }
-
-    public void setQuotations(ArrayList<Quotation> newQuotations)
-    {
-        quotations = newQuotations;
     }
 
     public void setBookings(ArrayList<Booking> newBookings)
@@ -166,9 +155,8 @@ public class EventController
             {
                 String[] values = data[i].split(";");
 
-                Quotation currQuotation = getHallById(Integer.parseInt(values[0])).getQuotationById(Integer.parseInt(values[7]));
                 Payment payment = new Payment(values[2], Double.parseDouble(values[3]),Double.parseDouble(values[4]),values[5],values[6]);
-                Booking booking = new Booking(values[1],payment,currQuotation);
+                Booking booking = new Booking(values[1],payment,getHallById(Integer.parseInt(values[0])).getQuotationById(Integer.parseInt(values[7])));
             }
         }
         catch(Exception e)
@@ -189,6 +177,7 @@ public class EventController
             for(int i = 0 ; i < data.length ; i++)
             {
                 String[] values = data[i].split(";");
+                getHallById(1).addQuotation(1,new Date(),new Date(),2,"2",true,"",10,"",new Customer(1,"1","1","1","1","1","1"),1);
 
                 getHallById(Integer.parseInt(values[0])).addQuotation(Integer.parseInt(values[1]),
                     new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(values[2]),
@@ -198,6 +187,7 @@ public class EventController
         }
         catch(Exception e)
         {
+            System.out.println("Error");
         }
     }
 
@@ -246,56 +236,31 @@ public class EventController
         }        
     }
 
-    private void writeToBookingsAndPaymentsFile(String path, boolean toAppend, boolean onlyUpdatedOnes)
+    private void writeToBookingsAndPaymentsFile(String path, Booking booking)
     {
         StringBuffer strBuf = new StringBuffer("");
-        if(onlyUpdatedOnes)
-        {
-            int lastIndex = getUsers().size() - 1;
-            strBuf.append(getBookings().get(lastIndex).getStatus() 
-                + ";" + getBookings().get(lastIndex).getPayment().getReceiptNo() + ";" + getBookings().get(lastIndex).getPayment().getDepositAmount()
-                + ";" + getBookings().get(lastIndex).getPayment().getBalanceAmount() + ";" + getBookings().get(lastIndex).getPayment().getPaymentType()
-                + ";" + getBookings().get(lastIndex).getPayment().getPaymentStatus()
-                + ";" + getBookings().get(lastIndex).getQuotation().getQuotationId()
-                +"\n");
-        }
-        else
-        {
-            for(int i = 0; i < getQuotations().size(); i++)
-            {
-                strBuf.append( getBookings().get(i).getStatus() 
-                    + ";" + getBookings().get(i).getPayment().getReceiptNo() + ";" + getBookings().get(i).getPayment().getDepositAmount()
-                    + ";" + getBookings().get(i).getPayment().getBalanceAmount() + ";" + getBookings().get(i).getPayment().getPaymentType()
-                    + ";" + getBookings().get(i).getPayment().getPaymentStatus()
-                    + ";" + getBookings().get(i).getQuotation().getQuotationId()
-                    +"\n");
-            }
-        }
-        writeFile(path, strBuf.toString(), toAppend);
+
+        strBuf.append(booking.getStatus() 
+            + ";" + booking.getPayment().getReceiptNo() + ";" + booking.getPayment().getDepositAmount()
+            + ";" + booking.getPayment().getBalanceAmount() + ";" + booking.getPayment().getPaymentType()
+            + ";" + booking.getPayment().getPaymentStatus()
+            + ";" + booking.getQuotation().getQuotationId()
+            +"\n");
+
+        writeFile(path, strBuf.toString(), true);
     }
 
-    private void writeToQuotationsFile(String path, boolean toAppend, boolean onlyUpdatedOnes)
+    private void writeToQuotationsFile(String path, boolean toAppend, boolean onlyUpdatedOnes, ArrayList<Quotation> quotations)
     {
         StringBuffer strBuf = new StringBuffer("");
         if(onlyUpdatedOnes)
         {
-            int lastIndex = getUsers().size() - 1;
-            strBuf.append(getQuotations().get(lastIndex).getHallId() + ";"+ getQuotations().get(lastIndex).getQuotationId() + ";" + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(getQuotations().get(lastIndex).getStartEventDateTime()) 
-                + ";" + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(getQuotations().get(lastIndex).getEndEventDateTime()) + ";" + getQuotations().get(lastIndex).getEventType()  
-                + ";" + (getQuotations().get(lastIndex).getRequiresCatering() == true ? "y" : "n") + ";" + getQuotations().get(lastIndex).getSpecialRequirements()  
-                + ";" + getQuotations().get(lastIndex).getFinalPrice()+ ";" + getQuotations().get(lastIndex).getQuotationStatus()+ ";" + getQuotations().get(lastIndex).getCustomer().getUserId()
+            int lastIndex = quotations.size() - 1;
+            strBuf.append(quotations.get(lastIndex).getHallId() + ";"+ quotations.get(lastIndex).getQuotationId() + ";" + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotations.get(lastIndex).getStartEventDateTime()) 
+                + ";" + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotations.get(lastIndex).getEndEventDateTime()) + ";" + quotations.get(lastIndex).getNumberOfAttendees() + ";" + quotations.get(lastIndex).getEventType()  
+                + ";" + (quotations.get(lastIndex).getRequiresCatering() == true ? "y" : "n") + ";" + quotations.get(lastIndex).getSpecialRequirements()  
+                + ";" + quotations.get(lastIndex).getFinalPrice()+ ";" + quotations.get(lastIndex).getQuotationStatus()+ ";" + quotations.get(lastIndex).getCustomer().getUserId()
                 +"\n");
-        }
-        else
-        {
-            for(int i = 0; i < getQuotations().size(); i++)
-            {
-                strBuf.append(getQuotations().get(i).getHallId() + ";"+ getQuotations().get(i).getQuotationId() + ";" + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(getQuotations().get(i).getStartEventDateTime()) 
-                    + ";" + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(getQuotations().get(i).getEndEventDateTime()) + ";" + getQuotations().get(i).getEventType()  
-                    + ";" + (getQuotations().get(i).getRequiresCatering() == true ? "y" : "n") + ";" + getQuotations().get(i).getSpecialRequirements()  
-                    + ";" + getQuotations().get(i).getFinalPrice()+ ";" + getQuotations().get(i).getQuotationStatus()+ ";" + getQuotations().get(i).getCustomer().getUserId()
-                    +"\n");
-            }
         }
         writeFile(path, strBuf.toString(), toAppend);
     }
@@ -745,11 +710,12 @@ public class EventController
     private void requestQuotation(Hall selectedHall)
     {
         displayHeader("REQUEST QUOTATION");
-        String inpEventDate = acceptStringInput("Enter Event Start Date Time (dd/MM/yyyy HH:mm)");
         boolean isValid = false;
         Date startEventDate = new Date();
         while(!isValid)
         {
+            String inpEventDate = acceptStringInput("Enter Event Start Date Time (dd/MM/yyyy HH:mm)");
+
             try
             {
                 startEventDate = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(inpEventDate);
@@ -760,11 +726,12 @@ public class EventController
 
             }
         }
-        String inpEndEventDate = acceptStringInput("Enter Event End Date Time (dd/MM/yyyy HH:mm)");
         isValid = false;
         Date endEventDate = new Date();
         while(!isValid)
         {
+            String inpEndEventDate = acceptStringInput("Enter Event End Date Time (dd/MM/yyyy HH:mm)");
+
             try
             {
                 endEventDate = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(inpEndEventDate);
@@ -783,7 +750,7 @@ public class EventController
         System.out.println("Total Price: " + finalPrice);
         selectedHall.addQuotation(1,startEventDate,endEventDate,noOfAttendees,eventType, requiresCatering == 'y' ? true : false,specialReq,
             finalPrice,"PENDING",getCustomerById(getUsers().get(0).getUserId()),selectedHall.getHallId());
-        writeToQuotationsFile("quotations.txt",true,true);
+        writeToQuotationsFile("quotations.txt",true,true, selectedHall.getQuotations());
         System.out.println("Your quotation request has been sent to the owner. Once the owner responds, you can use the View Quotation Responses option to view it!");
         searchHalls("","");
     }
@@ -799,7 +766,7 @@ public class EventController
         if(viewableHall!=null)
         {
             System.out.println(viewableHall.displayShort());
-            System.out.println("REVIEWS:");
+            System.out.println("\nREVIEWS:\n");
             System.out.println(viewableHall.getAllReviews());
         }
         else
@@ -824,7 +791,6 @@ public class EventController
         displayHeader("QUOTATION RESPONSES");
         for(Hall hall : halls)
         {
-            String abc = hall.getCustomerQuotationResponses(customerId);
             if(!hall.getCustomerQuotationResponses(customerId).equals(""))
                 System.out.println(hall.getCustomerQuotationResponses(customerId));
         }
@@ -959,7 +925,7 @@ public class EventController
         receiptNo += customerId;
         Payment payment = new Payment(receiptNo,depositAmount, balanceAmount,paymentType,"PARTIAL");
         Booking booking = new Booking("UPCOMING",payment,currQuotation);
-        writeToBookingsAndPaymentsFile("bookings_payments.txt",true,true);
+        writeToBookingsAndPaymentsFile("bookings_payments.txt",booking);
     }
 
     private void viewReceipt(int customerId)

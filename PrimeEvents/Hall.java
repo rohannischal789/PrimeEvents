@@ -307,7 +307,7 @@ public class Hall
         String toReturn = "";
         for(int i = 0 ; i < reviews.size(); i++)
         {
-            toReturn += reviews.get(i).getRating() + " stars | " + reviews.get(i).getReview() + " | Customer name: " 
+            toReturn += i+1 + ". " + reviews.get(i).getRating() + " stars | " + reviews.get(i).getReview() + " | Customer name: " 
             + reviews.get(i).getCustomer().getFirstName() + " " + reviews.get(i).getCustomer().getLastName() + " |\n\n";
         }
         return toReturn;            

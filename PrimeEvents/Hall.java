@@ -352,22 +352,6 @@ public class Hall
 
     public String getCustomerQuotationDetails(int customerId, int quotationId)
     {
-
-        /*
-        Name: Hall 17
-        Suburb: Clayton
-        Address: 17, Clayton Road, Clayton
-        Capacity: 300
-        Deposit: 50%
-        Event Type: Birthday
-        Price: $1000
-        Event Date: 12/09/2019
-        Total number of attendees: 150
-        Catering required: Yes
-        Any special requirements: Require Vegan food options
-        Status: Accepted
-        Deposit Paid: No
-         */
         Quotation currQuotation = null;
         for(Quotation quotation : getQuotationByCustomerId(customerId))
         {
@@ -401,6 +385,32 @@ public class Hall
         }
 
         return null;
+    }
+    
+    public String getQuotationRequests()
+    {
+        StringBuffer str = new StringBuffer("");
+
+        for(Quotation quotation: getQuotations())
+        {
+            if(quotation.getQuotationStatus() == "PENDING")
+                str.append(quotation.getQuotationId() + ". " + getHallName() + ", " + getSuburb() + ", " 
+                + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotation.getStartEventDateTime()) + " - " + quotation.getQuotationStatus() + "\n");
+        }
+        return str.toString();
+    }
+    
+    public String getQuotationRequestsByID(int quotationID)
+    {
+        StringBuffer str = new StringBuffer("");
+
+        for(Quotation quotation: getQuotations())
+        {
+            if(quotation.getQuotationStatus() == "PENDING" && quotation.getQuotationId() == quotationID)
+                str.append(quotation.getQuotationId() + ". " + getHallName() + ", " + getSuburb() + ", " 
+                + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotation.getStartEventDateTime()) + " - " + quotation.getQuotationStatus() + "\n");
+        }
+        return str.toString();
     }
 
 }

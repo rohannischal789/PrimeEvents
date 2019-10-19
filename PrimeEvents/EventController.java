@@ -302,6 +302,20 @@ public class EventController
                 + ";" + quotations.get(lastIndex).getFinalPrice()+ ";" + quotations.get(lastIndex).getQuotationStatus()+ ";" + quotations.get(lastIndex).getCustomer().getUserId()
                 +"\n");
         }
+        else
+        {
+            for(Hall hall: halls)
+            {
+                for(Quotation quotation: hall.getQuotations())
+                {
+                    strBuf.append(quotation.getHallId() + ";"+ quotation.getQuotationId() + ";" + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotation.getStartEventDateTime()) 
+                        + ";" + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotation.getEndEventDateTime()) + ";" + quotation.getNumberOfAttendees() + ";" + quotation.getEventType()  
+                        + ";" + (quotation.getRequiresCatering() == true ? "y" : "n") + ";" + quotation.getSpecialRequirements()  
+                        + ";" + quotation.getFinalPrice()+ ";" + quotation.getQuotationStatus()+ ";" + quotation.getCustomer().getUserId()
+                        +"\n");
+                }
+            }
+        }
         writeFile(path, strBuf.toString(), toAppend);
     }
 
@@ -654,7 +668,7 @@ public class EventController
         for(Hall hall : halls)
         {
             if(hall.getOwner().getUserId() == ownerID)
-                if(hall.getQuotationRequests() != null)
+                if(!hall.getQuotationRequests().equals(""))
                     strBuf.append(hall.getQuotationRequests());
         }
         return strBuf.toString();
@@ -665,9 +679,14 @@ public class EventController
         for(Hall hall : halls)
         {
             if(hall.getOwner().getUserId() == userID)
-                if(hall.getQuotationRequestsByID(quotationID) != null)
+                if(!hall.getQuotationRequestsByID(quotationID).equals(""))
+                {
                     hall.getQuotationById(quotationID).setQuotationStatus(status);
+                    break;
+                }
         }
+        writeToQuotationsFile("quotations.txt",false,false, null);
+
     }
 
     public String getPaymentsForOwner()

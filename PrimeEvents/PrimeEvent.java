@@ -555,7 +555,7 @@ public class PrimeEvent
         {
             System.out.println(quotationResponse);
             boolean isValid = false;
-            
+
             if(getEvent().getUserRole(userID).equals("CUSTOMER"))
             {
                 while(!isValid)
@@ -582,54 +582,63 @@ public class PrimeEvent
             }
             else
             {
-                
+
                 while(!isValid)
                 {
-                    char choice = acceptStringInput("1. Accept Quotation\n2. Reject Quotation\nB. Go Back\nEnter your choice:").charAt(0);
-                    switch(choice)
+                    if(!getEvent().isQuotationAccepted(quotationID))
                     {
-                        case '1': isValid = true; 
-                        char accept = acceptStringInput("Do you want to accept the quotation(y/n)?").charAt(0);
-                        switch(accept)
+                        char choice = acceptStringInput("1. Accept Quotation\n2. Reject Quotation\nB. Go Back\nEnter your choice:").charAt(0);
+                        switch(choice)
                         {
-                            case 'y':
-                            isValid = true;
-                            getEvent().updateQuotationStatus(userID, quotationID, "ACCEPTED");
-                            System.out.println("Quotation accepted!! The requester can now book the hall");
-                            displayQuotationRequests(userID);
+                            case '1': isValid = true; 
+                            char accept = acceptStringInput("Do you want to accept the quotation(y/n)?").charAt(0);
+                            switch(accept)
+                            {
+                                case 'y':
+                                isValid = true;
+                                getEvent().updateQuotationStatus(userID, quotationID, "ACCEPTED");
+                                System.out.println("Quotation accepted!! The requester can now book the hall");
+                                displayQuotationRequests(userID);
+                                break;
+                                case 'n':
+                                isValid = true;
+                                System.out.println("Action cancelled!! Going back to Quotation details");
+                                displayQuotationDetail(userID, quotationID);
+                                break;
+                                default:
+                                System.out.println("Invalid choice. Please try again!");
+                            }
                             break;
-                            case 'n':
-                            isValid = true;
-                            System.out.println("Action cancelled!! Going back to Quotation details");
-                            displayQuotationDetail(userID, quotationID);
+                            case '2': isValid = true;
+                            char input = acceptStringInput("Do you want to reject the quotation(y/n)?").charAt(0);
+                            switch(input)
+                            {
+                                case 'y':
+                                isValid = true;
+                                getEvent().updateQuotationStatus(userID, quotationID, "REJECTED");
+                                displayQuotationRequests(userID);
+                                System.out.println("Quotation rejected!!");
+                                break;
+                                case 'n':
+                                isValid = true;
+                                System.out.println("Action cancelled!! Going back to Quotation details");
+                                displayQuotationDetail(userID, quotationID);
+                                break;
+                                default:
+                                System.out.println("Invalid choice. Please try again!");
+                            }
                             break;
+                            case 'b': isValid = true; 
+                            displayQuotationRequests(userID); break;
                             default:
                             System.out.println("Invalid choice. Please try again!");
                         }
-                        break;
-                        case '2': isValid = true;
-                        char input = acceptStringInput("Do you want to reject the quotation(y/n)?").charAt(0);
-                        switch(input)
-                        {
-                            case 'y':
-                            isValid = true;
-                            getEvent().updateQuotationStatus(userID, quotationID, "REJECTED");
-                            displayQuotationRequests(userID);
-                            System.out.println("Quotation rejected!!");
-                            break;
-                            case 'n':
-                            isValid = true;
-                            System.out.println("Action cancelled!! Going back to Quotation details");
-                            displayQuotationDetail(userID, quotationID);
-                            break;
-                            default:
-                            System.out.println("Invalid choice. Please try again!");
-                        }
-                        break;
-                        case 'b': isValid = true; 
-                        displayQuotationResponse(userID); break;
-                        default:
-                        System.out.println("Invalid choice. Please try again!");
+                    }
+                    else
+                    {
+                        System.out.println("The quotation has already been accepted/rejected. Press any key to go back");
+                        promptForKey();
+                        displayQuotationRequests(userID);
                     }
                 }
             }
@@ -638,7 +647,14 @@ public class PrimeEvent
         {
             System.out.println("Invalid quotation ID! Press any key to go back");
             promptForKey();
-            displayQuotationResponse(userID);
+            if(getEvent().getUserRole(userID).equals("CUSTOMER"))
+            {
+                displayQuotationResponse(userID);
+            }
+            else
+            {
+                displayQuotationRequests(userID); 
+            }
         }
 
     }
@@ -731,7 +747,7 @@ public class PrimeEvent
     {
         displayHeader("QUOTATION REQUESTS");
         String quotationRequests = getEvent().getQuotationRequests(ownerID);
-        if(quotationRequests != "")
+        if(!quotationRequests.equals(""))
         {
             System.out.println(quotationRequests);
         }

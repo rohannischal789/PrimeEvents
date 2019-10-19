@@ -393,12 +393,12 @@ public class Hall
 
         for(Quotation quotation: getQuotations())
         {
-            if(quotation.getQuotationStatus() == "PENDING")
-                str.append(quotation.getQuotationId() + ". " + getHallName() + ", " + getSuburb() + ", " 
+            str.append(quotation.getQuotationId() + ". " + getHallName() + ", " + getSuburb() + ", " 
                 + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotation.getStartEventDateTime()) + " - " + quotation.getQuotationStatus() + "\n");
         }
         return str.toString();
     }
+    
     
     public String getQuotationRequestsByID(int quotationID)
     {
@@ -406,7 +406,7 @@ public class Hall
 
         for(Quotation quotation: getQuotations())
         {
-            if(quotation.getQuotationStatus() == "PENDING" && quotation.getQuotationId() == quotationID)
+            if(quotation.getQuotationId() == quotationID)
                 str.append(quotation.getQuotationId() + ". " + getHallName() + ", " + getSuburb() + ", " 
                 + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotation.getStartEventDateTime()) + " - " + quotation.getQuotationStatus() + "\n");
         }

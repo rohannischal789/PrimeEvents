@@ -252,33 +252,13 @@ public class PrimeEvent
                 {
                     case 1: 
                     isValid = true; 
-                    boolean continueManageUser = true;
-                    while(continueManageUser)
-                    {  
-                        displayHeader("MANAGE USERS");
-                        System.out.println(getEvent().getAllUsers());
-                        System.out.println("\nOptions:");
-                        String manageUserOption = acceptStringInput("L. Lock or Unlock a User\nB. Go Back\nEnter your choice:");                     
-                        char optionValue = manageUserOption.toLowerCase().charAt(0);
-                        switch(optionValue)
-                        {    
-                            case 'l': 
-                            int selectedUserId = acceptIntegerInput("Enter the number besides the user to select: ");
-                            getEvent().fetchUserById(selectedUserId);
-                            System.out.println("\n");   
-                            break;
-                            case 'b':
-                            continueManageUser = false; 
-                            isValid = false;
-                            break;
-                            default:
-                            System.out.println("Invalid choice. Please try again");
-                        }
-                    }                 
+                    displayManageUsers();              
                     break;
-
-                    case 2: isValid = true; break;
-                    case 0: isValid = true; 
+                    case 2: 
+                    isValid = true; 
+                    break;
+                    case 0: 
+                    isValid = true; 
                     displayLogout(); 
                     break; 
                     default:
@@ -286,27 +266,88 @@ public class PrimeEvent
                 }
             }
         }
-        /*else if(getEvent().getUsers().get(0).getRole().equalsIgnoreCase("ADMINISTRATOR"))
-        {
-        displayHeader("HOME - ADMIN");
+    }
+
+    private void displayManageUsers()
+    {
+        displayHeader("MANAGE USERS");
+        System.out.println(getEvent().getAllUsers());
+        System.out.println("\nOptions:");
         boolean isValid = false;
         while(!isValid)
+        {  
+            String manageUserOption = acceptStringInput("Enter number to select the user \nB. Go Back\nEnter your choice:");    
+
+            if(isInteger(manageUserOption) && Integer.parseInt(manageUserOption) != 0)
+            {
+                int selectedID = Integer.parseInt(manageUserOption);
+                if(!getEvent().getUserById(selectedID).equals(""))
+                {
+                    isValid = true;
+                    displayUserDetails(selectedID);
+                }
+                else
+                {
+                    System.out.println("\nInvalid number entered. Please try again!");
+                    promptForKey();
+                    displayManageUsers();
+                }
+
+            }
+            else
+            {
+                char optionValue = manageUserOption.toLowerCase().charAt(0);
+                switch(optionValue)
+                {
+                    case 'b': isValid = true; displayHome(); break;
+                    case '0': isValid = true; displayLogout(); break;
+                    default:
+                    System.out.println("\nInvalid choice. Please try again");
+                    promptForKey();
+                }
+            }
+        }  
+    }
+
+    private void displayUserDetails(int userID)
+    {
+        displayHeader("SELECT USER");
+        String userDetail = getEvent().getUserById(userID);
+        if(!userDetail.equals(""))
         {
-        int input = acceptIntegerInput("1. Manage Users\n2. Manage Discounts\n0. Logout\nEnter your choice:");
-        switch(input)
+            System.out.println(userDetail);
+            if(!getEvent().isUserLocked(userID))
+            {
+                switch(acceptStringInput("Do you wish to LOCK this user? (Y/N)").charAt(0))
+                {
+                    case 'y':
+                    getEvent().updateUserLockStatus(userID, true);
+                    System.out.println("User Locked successfully!!");                
+                    break;
+                    case 'n':
+                    System.out.println("User was not Locked!!");           
+                    break;           
+                }
+            }
+            else
+            {
+                switch(acceptStringInput("Do you wish to UNLOCK this user? (Y/N)").charAt(0))
+                {
+                    case 'y':
+                    getEvent().updateUserLockStatus(userID, false);
+                    System.out.println("User unlocked successfully!!");                        
+                    break;
+                    case 'n':
+                    System.out.println("User is still Locked!!");           
+                    break;           
+                }
+            }   
+        }
+        else
         {
-        case 1: isValid = true; 
-        //showManageHalls(); 
-        break;
-        case 2: isValid = true; break;
-        case 0: isValid = true; 
-        displayLogout(); 
-        break; 
-        default:
-        System.out.println("Invalid choice. Please try again");
-        }
-        }
-        }*/
+            System.out.println("Invalid id entered. Please try again");
+        }  
+        displayManageUsers();
     }
 
     private void displayAllHalls(String suburbName, String eventType)

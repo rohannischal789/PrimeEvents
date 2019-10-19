@@ -63,6 +63,42 @@ public class EventController
     {
         halls = newHalls;
     }
+    
+    public boolean isUserLocked(int userId)
+    {
+        for(int i = 0; i<getUsers().size();i++)
+        {
+            if(getUsers().get(i).getUserId() == userId)
+            {
+                return getUsers().get(i).getIsLockedOut();     
+            }
+        }
+        return false;
+    }
+    
+    public void updateUserLockStatus(int userId, boolean status)
+    {
+        for(int i = 0; i<getUsers().size();i++)
+        {
+            if(getUsers().get(i).getUserId() == userId)
+            {
+                getUsers().get(i).setIsLockedOut(status);   
+            }
+        }
+        writeToUsersFile("users.txt",false,false);
+    }
+    
+    public String getUserById(int id)
+    {
+        for(int i = 0; i<getUsers().size();i++)
+        {
+            if(getUsers().get(i).getUserId() == id && !getUsers().get(i).getRole().equals("ADMINISTRATOR"))
+            {
+                return getUsers().get(i).display();     
+            }
+        }
+        return "";
+    }
 
     public Owner getOwnerById(int id)
     {
@@ -997,63 +1033,14 @@ public class EventController
         StringBuffer strBuff = new StringBuffer("");
         for(int i = 0 ; i < getUsers().size() ; i++)
         {
-            if(getUsers().get(i).getRole().equals(""))
+            if(!getUsers().get(i).getRole().equals("ADMINISTRATOR"))
             {
                 strBuff.append(getUsers().get(i).display()+ "\n");
             }
         }
         return strBuff.toString();
     }
-
-    public void fetchUserById(int selectedUserId)
-    {
-        for(int i = 0 ; i < users.size() ; i++){            
-            int userId = users.get(i).getUserId();
-            if(userId == selectedUserId){
-                String firstName = users.get(i).getFirstName();
-                String lastName = users.get(i).getLastName();
-                String role = users.get(i).getRole();
-                boolean lockStatus = users.get(i).getIsLockedOut();
-                String displayLockStatus = "";
-                if(lockStatus == false){
-                    displayLockStatus = "Unlocked";
-                }
-                else{
-                    displayLockStatus = "Locked";
-                }                
-                System.out.println("************************************************************");
-                System.out.println(userId+". "+firstName+" "+lastName+" "+role+"  - "+displayLockStatus);
-                System.out.println("************************************************************");
-                if(lockStatus == false){
-                    switch(acceptStringInput("Do you wish to LOCK this user? (Y/N)").charAt(0))
-                    {
-                        case 'y':
-                        users.get(i).setIsLockedOut(true);
-                        writeToUsersFile("users.txt",false,false);
-                        System.out.println("User Locked successfully!!");                
-                        break;
-                        case 'n':
-                        System.out.println("User was not Locked!!");           
-                        break;           
-                    }
-                }
-                else{
-                    switch(acceptStringInput("Do you wish to UNLOCK this user? (Y/N)").charAt(0))
-                    {
-                        case 'y':
-                        users.get(i).setIsLockedOut(false);
-                        writeToUsersFile("users.txt",false,false);
-                        System.out.println("User unlocked successfully!!");                        
-                        break;
-                        case 'n':
-                        System.out.println("User is still Locked!!");           
-                        break;           
-                    }
-                }                
-            }            
-        }  
-    }
-
+    
     private void displayHeader(String header)
     {
         System.out.println("\n***********************************");

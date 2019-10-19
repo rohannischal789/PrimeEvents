@@ -32,6 +32,8 @@ public class EventController
     {
         users = new ArrayList<User>();
         halls = new ArrayList<Hall>();
+        bookings = new ArrayList<Booking>();
+        payments = new ArrayList<Payment>();
     }
 
     public ArrayList<Hall> getHalls()
@@ -63,7 +65,7 @@ public class EventController
     {
         halls = newHalls;
     }
-    
+
     public boolean isUserLocked(int userId)
     {
         for(int i = 0; i<getUsers().size();i++)
@@ -75,7 +77,7 @@ public class EventController
         }
         return false;
     }
-    
+
     public void updateUserLockStatus(int userId, boolean status)
     {
         for(int i = 0; i<getUsers().size();i++)
@@ -87,7 +89,7 @@ public class EventController
         }
         writeToUsersFile("users.txt",false,false);
     }
-    
+
     public String getUserById(int id)
     {
         for(int i = 0; i<getUsers().size();i++)
@@ -201,13 +203,15 @@ public class EventController
         try
         {
             String fileData = readFile("quotations.txt");
-            String[] data = fileData.split("\\n"); // split data by new line character
+            String[] data = fileData.split("\\n"); // split data by new line character4
+            payments = new ArrayList<Payment>();
+            bookings = new ArrayList<Booking>();
             ArrayList<Quotation> acceptedQuotations = new ArrayList<Quotation>();
             for(int i = 0 ; i < data.length ; i++)
             {
                 String[] values = data[i].split(";");
 
-                if(values[9].toLowerCase() == "ACCEPTED")
+                if(values[9].toUpperCase().equals("ACCEPTED"))
                 {
                     acceptedQuotations.add(new Quotation(Integer.parseInt(values[1]),
                             new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(values[2]),
@@ -223,11 +227,11 @@ public class EventController
                 String[] values = data[i].split(";");
                 // get accepted quotations
                 // use quotation to search and find completed payment through hall id
-                Quotation currentQuotation = getHallById(Integer.parseInt(values[0])).getQuotationById(Integer.parseInt(values[7]));
-                if(acceptedQuotations.contains(currentQuotation))
+                Quotation currentQuotation = getOwnerHallQuotation(userId,Integer.parseInt(values[6]),acceptedQuotations);
+                if(currentQuotation != null && acceptedQuotations.contains(currentQuotation))
                 {
-                    Payment payment = new Payment(values[2], Double.parseDouble(values[3]),Double.parseDouble(values[4]),values[5],values[6]);
-                    Booking booking = new Booking(values[1],payment,getHallById(Integer.parseInt(values[0])).getQuotationById(Integer.parseInt(values[7])));
+                    Payment payment = new Payment(values[1], Double.parseDouble(values[2]),Double.parseDouble(values[3]),values[4],values[5]);
+                    Booking booking = new Booking(values[0],payment,currentQuotation);
                     payments.add(payment);
                     bookings.add(booking);
                 }
@@ -235,7 +239,61 @@ public class EventController
         }
         catch(Exception e)
         {
+            System.out.println("Error");
         }
+    }
+
+    /*private void writeAllBookings()
+    {
+        String fileData = readFile("bookings_payments.txt");
+        String[] data = fileData.split("\\n"); // split data by new line character
+        ArrayList<Booking> allBookings = new ArrayList<>();
+        for(int i = 0 ; i < data.length ; i++)
+        {
+            String[] values = data[i].split(";");
+            // get accepted quotations
+            // use quotation to search and find completed payment through hall id
+            Quotation currentQuotation = getOwnerHallQuotation(userId,Integer.parseInt(values[6]),acceptedQuotations);
+            if(currentQuotation != null)
+            {
+                Payment payment = new Payment(values[1], Double.parseDouble(values[2]),Double.parseDouble(values[3]),values[4],values[5]);
+                Booking booking = new Booking(values[0],payment,currentQuotation);
+                if(!bookings.contains(booking))
+                    allBookings.add(booking);
+            }
+        }
+        StringBuffer strBuf = new StringBuffer("");
+        for(Booking booking : allBookings)
+        {
+
+        strBuf.append(booking.getStatus() 
+            + ";" + booking.getPayment().getReceiptNo() + ";" + booking.getPayment().getDepositAmount()
+            + ";" + booking.getPayment().getBalanceAmount() + ";" + booking.getPayment().getPaymentType()
+            + ";" + booking.getPayment().getPaymentStatus()
+            + ";" + booking.getQuotation().getQuotationId()
+            +"\n");
+        }
+
+        writeFile(path, strBuf.toString(), true);
+    }*/
+
+    private Quotation getOwnerHallQuotation(int userID,int quotationID, ArrayList<Quotation> acceptedQuotations)
+    {
+        for(Hall hall : getHalls())
+        {
+            if(hall.getOwner().getUserId() == userID)
+            {
+                for(Quotation quotation: acceptedQuotations)
+                {
+                    if(quotation.getQuotationId()== quotationID && quotation.getQuotationStatus().toUpperCase().equals("ACCEPTED"))
+                        return quotation;
+
+                }
+
+            }
+
+        }
+        return null;
     }
 
     private void fetchQuotationData()
@@ -755,7 +813,10 @@ public class EventController
         StringBuffer strBuf = new StringBuffer("");
         for(Booking booking : bookings)
         {
-            strBuf.append(booking.getBookingDetails());
+            strBuf.append(booking.getQuotation().getQuotationId() + ". " + getHallById(booking.getQuotation().getHallId()).getHallName() + ", (" 
+                + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(booking.getQuotation().getStartEventDateTime()) + " -"
+                    + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(booking.getQuotation().getEndEventDateTime()) + ") - " + booking.getPayment().getPaymentStatus());
+
         }
         return strBuf.toString();
     }
@@ -767,7 +828,9 @@ public class EventController
         {
             if(booking.getQuotation().getQuotationId() == quotationID)
             {
-                strBuf.append(booking.getBookingDetails());
+                strBuf.append(booking.getQuotation().getQuotationId() + ". " + getHallById(booking.getQuotation().getHallId()).getHallName() + ", " 
+                + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(booking.getQuotation().getStartEventDateTime()) + " "
+                    + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(booking.getQuotation().getEndEventDateTime()) + " - " + booking.getPayment().getPaymentStatus());
                 break;
             }
         }
@@ -1040,7 +1103,7 @@ public class EventController
         }
         return strBuff.toString();
     }
-    
+
     private void displayHeader(String header)
     {
         System.out.println("\n***********************************");

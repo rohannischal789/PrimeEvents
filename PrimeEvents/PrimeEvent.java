@@ -917,15 +917,10 @@ public class PrimeEvent
     {
         displayHeader("PAYMENT DETAILS");
         String paymentDetail = getEvent().getPaymentDetails(quotationID);
-        if(paymentDetail != "")
+        if(!paymentDetail.equals(""))
         {
             System.out.println(paymentDetail);
-        }
-        else
-        {
-            System.out.println("Invalid payment ID");
-        }
-        boolean isValid = false;
+            boolean isValid = false;
         System.out.println("\nOptions:");
         while(!isValid)
         {
@@ -976,7 +971,13 @@ public class PrimeEvent
                 System.out.println("Invalid choice. Please try again!");
             }
         }
-
+        }
+        else
+        {
+            System.out.println("Invalid payment ID! Press any key to try again");
+            promptForKey();
+            displayPayments(userID);
+        }
     }
 
     private void displayBookings()

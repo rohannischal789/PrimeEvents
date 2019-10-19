@@ -24,6 +24,4 @@ comment7.text=\r\n\ Returns\ value\ of\ quotation\r\n\ @return\r\n
 comment8.params=quotation
 comment8.target=void\ setQuotation(Quotation)
 comment8.text=\r\n\ Sets\ new\ value\ of\ quotation\r\n\ @param\r\n
-comment9.params=
-comment9.target=java.lang.String\ getBookingDetails()
-numComments=10
+numComments=9

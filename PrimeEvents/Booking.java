@@ -74,13 +74,5 @@ public class Booking
     public void setQuotation(Quotation quotation) {
         this.quotation = quotation;
     }
-    
-    public String getBookingDetails()
-    {
-        // 1. Hall 1, 13/12/19 - 15/12/19 - Accepted
-        return getQuotation().getQuotationId() + ". " + getQuotation().getHallId() + " " + getQuotation().getStartEventDateTime() + " "
-        + getQuotation().getEndEventDateTime() + " - " + getPayment().getPaymentStatus();
-    
-    }
 
 }

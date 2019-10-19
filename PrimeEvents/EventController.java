@@ -6,7 +6,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.text.SimpleDateFormat;
-import java.text.ParseException;  
+import java.text.ParseException;
+import java.lang.Object;  
 
 /**
  * Write a description of class EventController here.
@@ -19,7 +20,6 @@ public class EventController
     private ArrayList<Hall> halls;
     private ArrayList<User> users;
     private ArrayList<Payment> payments;
-    private ArrayList<Quotation> quotations;
     private ArrayList<Booking> bookings;
     //private ArrayList<Owner> owners;
     //private ArrayList<Customer> customers;
@@ -52,16 +52,6 @@ public class EventController
     public void setPayments(ArrayList<Payment> newPayments)
     {
         payments = newPayments;
-    }
-
-    public ArrayList<Quotation> getQuotations()
-    {
-        return quotations;
-    }
-
-    public void setQuotations(ArrayList<Quotation> newQuotations)
-    {
-        quotations = newQuotations;
     }
 
     public void setUsers(ArrayList<User> newUsers)
@@ -538,9 +528,25 @@ public class EventController
         writeToQuotationsFile("quotations.txt",true,true, selectedHall.getQuotations());
     }
 
-    public double calculatePrice()
+    public int daysBetween(Date d1, Date d2)
     {
-        return 1000;
+        return (int)( (d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
+    }
+
+    public double calculatePrice(Date startEventDate, Date endEventDate, int noOfAttendees, String eventType, char requiresCatering, String specialReq, int hallID)
+    {
+        double multiplier = 1;
+        Hall currentHall = getHallById(hallID);
+        int dayDiff = daysBetween(startEventDate, endEventDate);
+        if(dayDiff>0)
+            multiplier *= dayDiff; 
+        double atendeesMul = 1;
+        if(currentHall.getCapacity()>0)
+            atendeesMul = noOfAttendees/currentHall.getCapacity();
+        multiplier *= atendeesMul;
+        double typeMul = requiresCatering == 'y' ?  atendeesMul : 0;
+        multiplier += typeMul;
+        return currentHall.getPrice() * multiplier;
     }
 
     public String getHallReviews(int hallID)
@@ -624,7 +630,7 @@ public class EventController
         {
             if(hall.getOwner().getUserId() == ownerID)
                 if(hall.getQuotationRequests() != null)
-                    System.out.println(hall.getQuotationRequests() );
+                    strBuf.append(hall.getQuotationRequests());
         }
         return strBuf.toString();
     }

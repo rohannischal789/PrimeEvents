@@ -349,14 +349,51 @@ public class PrimeEvent
 
             }
         }
-        int noOfAttendees = acceptIntegerInput("Enter total number of attendees");
-        String eventType = acceptStringInput("Enter your event type (Wedding ceremony, Wedding reception, Birthday, Anniversary)");
+        isValid = false;
+        int noOfAttendees = 0;
+        while(!isValid)
+        {
+            noOfAttendees = acceptIntegerInput("Enter total number of attendees");        
+            if(getEvent().getHallById(id).getCapacity() >= noOfAttendees)
+            {
+                isValid = true;
+            }
+        }
+        isValid = false;
+        String eventType = "";
+        while(!isValid)
+        {
+            eventType = acceptStringInput("Enter your event type (Wedding ceremony, Wedding reception, Birthday, Anniversary)");
+            if(getEvent().getHallById(id).getEventTypes().contains(eventType.toLowerCase()))
+            {
+                isValid = true;
+            }
+        }
         char requiresCatering = acceptStringInput("Do you require Catering by us(y/n):").toLowerCase().charAt(0);
         String specialReq = acceptStringInput("Any special requirements:");
-        Double finalPrice = getEvent().calculatePrice();
+        Double finalPrice = getEvent().calculatePrice(startEventDate,endEventDate,noOfAttendees,eventType, requiresCatering,specialReq,id);
         System.out.println("Total Price: " + finalPrice);
-        getEvent().requestQuotation(id, startEventDate,endEventDate,noOfAttendees,eventType, requiresCatering,specialReq,finalPrice);
-        System.out.println("Your quotation request has been sent to the owner. Once the owner responds, you can use the View Quotation Responses option to view it!");
+        char input = acceptStringInput("Do you confirm this quotation with price "+ finalPrice + "? (y/n)").toLowerCase().charAt(0);
+        isValid = false;
+        while(!isValid)
+        {
+            switch(input)
+            {
+                case 'y':
+                isValid = true;
+                getEvent().requestQuotation(id, startEventDate,endEventDate,noOfAttendees,eventType, requiresCatering,specialReq,finalPrice);
+                System.out.println("Your quotation request has been sent to the owner. Once the owner responds, you can use the View Quotation Responses option to view it!");
+                break;
+                case 'n':
+                isValid = true;
+                System.out.println("Quotation request not confirmed. Going back to View Hall");
+                displayHallDetails(id);
+                break;
+                default:
+                System.out.println("Invalid choice. Please try again");
+            }
+        }
+        promptForKey();
         displayAllHalls("","");
     }
 
@@ -375,7 +412,7 @@ public class PrimeEvent
         String hallReviews = getEvent().getHallReviews(hallID);
         if(hallReviews != "")
         {
-            //System.out.println(viewableHall.displayShort());
+            System.out.println(getEvent().getHallById(hallID).displayShort());
             System.out.println("\nREVIEWS:\n");
             System.out.println(hallReviews);
         }
@@ -387,7 +424,7 @@ public class PrimeEvent
         System.out.println("\nOptions:");
         while(!isValid)
         {
-            char goBack = acceptStringInput("\nB. Go Back\nEnter your choice:").toLowerCase().charAt(0);
+            char goBack = acceptStringInput("B. Go Back\nEnter your choice:").toLowerCase().charAt(0);
             switch(goBack)
             {
                 case 'b': 
@@ -398,7 +435,6 @@ public class PrimeEvent
                 System.out.println("Invalid choice. Please try again!");
             }
         }
-
     }
 
     private void displayQuotationResponse(int customerID)

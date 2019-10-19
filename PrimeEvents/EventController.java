@@ -299,7 +299,7 @@ public class EventController
             strBuf.append(quotations.get(lastIndex).getHallId() + ";"+ quotations.get(lastIndex).getQuotationId() + ";" + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotations.get(lastIndex).getStartEventDateTime()) 
                 + ";" + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotations.get(lastIndex).getEndEventDateTime()) + ";" + quotations.get(lastIndex).getNumberOfAttendees() + ";" + quotations.get(lastIndex).getEventType()  
                 + ";" + (quotations.get(lastIndex).getRequiresCatering() == true ? "y" : "n") + ";" + quotations.get(lastIndex).getSpecialRequirements()  
-                + ";" + quotations.get(lastIndex).getFinalPrice()+ ";" + quotations.get(lastIndex).getQuotationStatus()+ ";" + quotations.get(lastIndex).getCustomer().getUserId()
+                + ";" + quotations.get(lastIndex).getFinalPrice()+ ";" + quotations.get(lastIndex).getQuotationStatus()+ ";" + quotations.get(lastIndex).getCustomer().getUserId()+ ";" + quotations.get(lastIndex).getDepositPaid()
                 +"\n");
         }
         else
@@ -311,7 +311,7 @@ public class EventController
                     strBuf.append(quotation.getHallId() + ";"+ quotation.getQuotationId() + ";" + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotation.getStartEventDateTime()) 
                         + ";" + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotation.getEndEventDateTime()) + ";" + quotation.getNumberOfAttendees() + ";" + quotation.getEventType()  
                         + ";" + (quotation.getRequiresCatering() == true ? "y" : "n") + ";" + quotation.getSpecialRequirements()  
-                        + ";" + quotation.getFinalPrice()+ ";" + quotation.getQuotationStatus()+ ";" + quotation.getCustomer().getUserId()
+                        + ";" + quotation.getFinalPrice()+ ";" + quotation.getQuotationStatus()+ ";" + quotation.getCustomer().getUserId()+ ";" + quotation.getDepositPaid()
                         +"\n");
                 }
             }
@@ -678,9 +678,9 @@ public class EventController
                 {
                     double depositAmount = quotation.getFinalPrice() * (hall.getDeposit()/100);
                     strBuf.append("Hall Name: " + hall.getHallName() + "\nBooking Start Date: " 
-                    + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotation.getStartEventDateTime()) + "\nBooking End Date: " 
-                    + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotation.getEndEventDateTime()) + "\nTotal Price: " + quotation.getFinalPrice()
-                    + "\nDeposit Paid: " + depositAmount + "\nBalance: " + (quotation.getFinalPrice() - depositAmount));
+                        + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotation.getStartEventDateTime()) + "\nBooking End Date: " 
+                        + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotation.getEndEventDateTime()) + "\nTotal Price: " + quotation.getFinalPrice()
+                        + "\nDeposit Paid: " + depositAmount + "\nBalance: " + (quotation.getFinalPrice() - depositAmount));
                 }
             }
         }
@@ -990,6 +990,68 @@ public class EventController
     private void deleteHall()
     {
         chooseHall(true);
+    }
+
+    public String getAllUsers()
+    {
+        StringBuffer strBuff = new StringBuffer("");
+        for(int i = 0 ; i < getUsers().size() ; i++)
+        {
+            if(getUsers().get(i).getRole().equals(""))
+            {
+                strBuff.append(getUsers().get(i).display()+ "\n");
+            }
+        }
+        return strBuff.toString();
+    }
+
+    public void fetchUserById(int selectedUserId)
+    {
+        for(int i = 0 ; i < users.size() ; i++){            
+            int userId = users.get(i).getUserId();
+            if(userId == selectedUserId){
+                String firstName = users.get(i).getFirstName();
+                String lastName = users.get(i).getLastName();
+                String role = users.get(i).getRole();
+                boolean lockStatus = users.get(i).getIsLockedOut();
+                String displayLockStatus = "";
+                if(lockStatus == false){
+                    displayLockStatus = "Unlocked";
+                }
+                else{
+                    displayLockStatus = "Locked";
+                }                
+                System.out.println("************************************************************");
+                System.out.println(userId+". "+firstName+" "+lastName+" "+role+"  - "+displayLockStatus);
+                System.out.println("************************************************************");
+                if(lockStatus == false){
+                    switch(acceptStringInput("Do you wish to LOCK this user? (Y/N)").charAt(0))
+                    {
+                        case 'y':
+                        users.get(i).setIsLockedOut(true);
+                        writeToUsersFile("users.txt",false,false);
+                        System.out.println("User Locked successfully!!");                
+                        break;
+                        case 'n':
+                        System.out.println("User was not Locked!!");           
+                        break;           
+                    }
+                }
+                else{
+                    switch(acceptStringInput("Do you wish to UNLOCK this user? (Y/N)").charAt(0))
+                    {
+                        case 'y':
+                        users.get(i).setIsLockedOut(false);
+                        writeToUsersFile("users.txt",false,false);
+                        System.out.println("User unlocked successfully!!");                        
+                        break;
+                        case 'n':
+                        System.out.println("User is still Locked!!");           
+                        break;           
+                    }
+                }                
+            }            
+        }  
     }
 
     private void displayHeader(String header)

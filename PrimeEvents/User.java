@@ -158,5 +158,9 @@ public class User
     {
         this.invalidLogoutAttempts = invalidLogoutAttempts;
     }
-    ;
+    
+    public String display()
+    {
+        return getUserId() + ". "+ getFirstName() + " " +getLastName() + " - " + (getIsLockedOut() == true ? "Locked" : "Unlocked");
+    }
 }

@@ -242,17 +242,41 @@ public class PrimeEvent
             }
         }
         else if(getEvent().getUsers().get(0).getRole().equalsIgnoreCase("ADMINISTRATOR"))
-        {
-            displayHeader("HOME - ADMIN");
+        {            
             boolean isValid = false;
             while(!isValid)
             {
+                displayHeader("HOME - ADMIN");
                 int input = acceptIntegerInput("1. Manage Users\n2. Manage Discounts\n0. Logout\nEnter your choice:");
                 switch(input)
                 {
-                    case 1: isValid = true; 
-                    //showManageHalls(); 
+                    case 1: 
+                    isValid = true; 
+                    boolean continueManageUser = true;
+                    while(continueManageUser)
+                    {  
+                        displayHeader("MANAGE USERS");
+                        System.out.println(getEvent().getAllUsers());
+                        System.out.println("\nOptions:");
+                        String manageUserOption = acceptStringInput("L. Lock or Unlock a User\nB. Go Back\nEnter your choice:");                     
+                        char optionValue = manageUserOption.toLowerCase().charAt(0);
+                        switch(optionValue)
+                        {    
+                            case 'l': 
+                            int selectedUserId = acceptIntegerInput("Enter the number besides the user to select: ");
+                            getEvent().fetchUserById(selectedUserId);
+                            System.out.println("\n");   
+                            break;
+                            case 'b':
+                            continueManageUser = false; 
+                            isValid = false;
+                            break;
+                            default:
+                            System.out.println("Invalid choice. Please try again");
+                        }
+                    }                 
                     break;
+
                     case 2: isValid = true; break;
                     case 0: isValid = true; 
                     displayLogout(); 
@@ -262,6 +286,27 @@ public class PrimeEvent
                 }
             }
         }
+        /*else if(getEvent().getUsers().get(0).getRole().equalsIgnoreCase("ADMINISTRATOR"))
+        {
+        displayHeader("HOME - ADMIN");
+        boolean isValid = false;
+        while(!isValid)
+        {
+        int input = acceptIntegerInput("1. Manage Users\n2. Manage Discounts\n0. Logout\nEnter your choice:");
+        switch(input)
+        {
+        case 1: isValid = true; 
+        //showManageHalls(); 
+        break;
+        case 2: isValid = true; break;
+        case 0: isValid = true; 
+        displayLogout(); 
+        break; 
+        default:
+        System.out.println("Invalid choice. Please try again");
+        }
+        }
+        }*/
     }
 
     private void displayAllHalls(String suburbName, String eventType)

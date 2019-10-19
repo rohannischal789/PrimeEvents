@@ -448,7 +448,7 @@ public class PrimeEvent
                 case 'y':
                 isValid = true;
                 getEvent().requestQuotation(id, startEventDate,endEventDate,noOfAttendees,eventType, requiresCatering,specialReq,finalPrice);
-                System.out.println("Your quotation request has been sent to the owner. Once the owner responds, you can use the View Quotation Responses option to view it!");
+                System.out.println("Your quotation request has been sent to the owner. Once the owner responds, you can use the View Quotation Responses option to view it! Press any key to go to search halls");
                 break;
                 case 'n':
                 isValid = true;
@@ -560,7 +560,13 @@ public class PrimeEvent
             {
                 while(!isValid)
                 {
-                    if(getEvent().isQuotationAccepted(quotationID))
+                    if(getEvent().isBookingDepositPaid(userID, quotationID))
+                    {
+                        System.out.println("You have already paid the deposit for the booking. Press any key to go back");
+                        promptForKey();
+                        displayQuotationResponse(userID);
+                    }
+                    else if(getEvent().isQuotationAccepted(quotationID))
                     {
                         System.out.println("\nOptions:");
                         char choice = acceptStringInput("1. Pay deposit\nB. Go Back to Quotation Responses\nEnter your choice:").charAt(0);

@@ -20,6 +20,7 @@ public class Quotation
     private String quotationStatus;
     private int hallId;
     private Customer customer;
+    private boolean depositPaid;
 
     /**
      * Constructor for objects of class Quotation
@@ -32,7 +33,7 @@ public class Quotation
 
     public Quotation(int quotationId, Date startEventDateTime, Date endEventDateTime, int numberOfAttendees,String eventType,
     boolean requiresCatering, String specialRequirements, double finalPrice, String quotationStatus,
-    Customer customer, int hallId)
+    Customer customer, int hallId, boolean depositPaid)
     {
         this.quotationId = quotationId;
         this.startEventDateTime = startEventDateTime;
@@ -45,6 +46,7 @@ public class Quotation
         this.quotationStatus = quotationStatus;
         this.customer = customer;
         this.hallId = hallId;
+        this.depositPaid = depositPaid;
     }
 
     /**
@@ -222,5 +224,14 @@ public class Quotation
     {
         this.hallId = hallId;
     }
+    
+    public boolean getDepositPaid()
+    {
+        return depositPaid;
+    }
 
+    public void setDepositPaid(boolean depositPaid) 
+    {
+        this.depositPaid = depositPaid;
+    }
 }

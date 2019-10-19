@@ -288,7 +288,21 @@ public class Hall
     public String displayLong()
     {
         return "Name: " + hallName + "\nSuburb: " + suburb + "\nAddress: " + address + "\nCapacity: "
-        + capacity + "\nDeposit: " + deposit + "%\nEvent Types: " +  getAllEventTypes() + "\nPrice: " + price;
+        + capacity + "\nDeposit: " + deposit + "%\nEvent Types: " +  getAllEventTypes() + "\nPrice: " + price + "\nBooked Dates:" + getFormattedBookings();
+    }
+    
+    private String getFormattedBookings()
+    {
+        StringBuffer strBuf = new StringBuffer("");
+        for(Quotation quotation : getQuotations())
+        {
+            if(quotation.getDepositPaid())
+            {
+                strBuf.append(" " + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotation.getStartEventDateTime()) +" - " 
+                + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotation.getEndEventDateTime()) + ". " );
+            }
+        }
+        return strBuf.toString();
     }
 
     private String getAllEventTypes()
@@ -319,10 +333,10 @@ public class Hall
     }
 
     public void addQuotation(int quotationId, Date startEventDateTime, Date endEventDateTime, int numberOfAttendees,String eventType,
-    boolean requiresCatering, String specialRequirements, double finalPrice, String quotationStatus, Customer customer, int hallId)
+    boolean requiresCatering, String specialRequirements, double finalPrice, String quotationStatus, Customer customer, int hallId, boolean depositPaid)
     {
         getQuotations().add(new Quotation( quotationId, startEventDateTime, endEventDateTime, numberOfAttendees,eventType,
-                requiresCatering, specialRequirements,finalPrice, quotationStatus,customer, hallId));
+                requiresCatering, specialRequirements,finalPrice, quotationStatus,customer, hallId, depositPaid));
     }
 
     public ArrayList<Quotation> getQuotationByCustomerId(int customerId)
@@ -366,7 +380,31 @@ public class Hall
             + "Event Start Date: " + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(currQuotation.getStartEventDateTime())+ "\n"
             + "Event End Date: " + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(currQuotation.getEndEventDateTime())+ "\n" + "Total number of attendees: " + currQuotation.getNumberOfAttendees()+ "\n"
             + "Catering required: " + (currQuotation.getRequiresCatering() == true ? "Yes" : "No") + "\n" + "Special Requirements: " + currQuotation.getSpecialRequirements()+ "\n"
-            + "Status: " + currQuotation.getQuotationStatus()+ "\n" + "Deposit Paid: " + "No";
+            + "Status: " + currQuotation.getQuotationStatus()+ "\n" + "Deposit Paid: " + ((currQuotation.getDepositPaid() == true) ? "Yes" :"No");
+        }
+        else
+        {
+            return null;
+        }
+    }
+    
+    public String getFormattedReceipt(int customerId, int quotationId)
+    {
+        Quotation currQuotation = null;
+        for(Quotation quotation : getQuotationByCustomerId(customerId))
+        {
+            if(quotation.getQuotationId() == quotationId) 
+                currQuotation = quotation;
+        }
+        if(currQuotation!=null)
+        {
+            return "Name: " + getHallName() + "\n" + "Suburb: " + getSuburb() + "\n"
+            + "Address: " + getAddress()+ "\n" + "Capacity: " + getCapacity()+ "\n" + "Deposit: " + getDeposit() + "%\n"
+            + "Event Type: " + currQuotation.getEventType()+ "\n" + "Price: " + currQuotation.getFinalPrice()+ "\n"
+            + "Event Start Date: " + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(currQuotation.getStartEventDateTime())+ "\n"
+            + "Event End Date: " + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(currQuotation.getEndEventDateTime())+ "\n" + "Total number of attendees: " + currQuotation.getNumberOfAttendees()+ "\n"
+            + "Catering required: " + (currQuotation.getRequiresCatering() == true ? "Yes" : "No") + "\n" + "Special Requirements: " + currQuotation.getSpecialRequirements()+ "\n"
+            + "Status: " + currQuotation.getQuotationStatus()+ "\n" + "Deposit Paid: " + ((currQuotation.getDepositPaid() == true) ? "Yes" :"No");
         }
         else
         {

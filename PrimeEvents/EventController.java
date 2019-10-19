@@ -176,7 +176,7 @@ public class EventController
                     acceptedQuotations.add(new Quotation(Integer.parseInt(values[1]),
                             new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(values[2]),
                             new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(values[3]),Integer.parseInt(values[4]),values[5],Boolean.parseBoolean(values[6]),
-                            values[7],Double.parseDouble(values[8]),values[9],getCustomerById(Integer.parseInt(values[10])),Integer.parseInt(values[0])));
+                            values[7],Double.parseDouble(values[8]),values[9],getCustomerById(Integer.parseInt(values[10])),Integer.parseInt(values[0]),Boolean.parseBoolean(values[6])));
                 }
             }
 
@@ -218,7 +218,7 @@ public class EventController
                 getHallById(Integer.parseInt(values[0])).addQuotation(Integer.parseInt(values[1]),
                     new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(values[2]),
                     new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(values[3]),Integer.parseInt(values[4]),values[5],Boolean.parseBoolean(values[6]),
-                    values[7],Double.parseDouble(values[8]),values[9],getCustomerById(Integer.parseInt(values[10])),Integer.parseInt(values[0]));
+                    values[7],Double.parseDouble(values[8]),values[9],getCustomerById(Integer.parseInt(values[10])),Integer.parseInt(values[0]),Boolean.parseBoolean(values[11]));
             }
         }
         catch(Exception e)
@@ -546,7 +546,7 @@ public class EventController
     {
         Hall selectedHall = getHallById(hallID);
         selectedHall.addQuotation(getMaxQuotationId()+1,startEventDate,endEventDate,noOfAttendees,eventType, requiresCatering == 'y' ? true : false,specialReq,
-            finalPrice,"PENDING",getCustomerById(getUsers().get(0).getUserId()),hallID);
+            finalPrice,"PENDING",getCustomerById(getUsers().get(0).getUserId()),hallID, false);
         writeToQuotationsFile("quotations.txt",true,true, selectedHall.getQuotations());
     }
 
@@ -627,6 +627,21 @@ public class EventController
         return false;
     }
 
+    public boolean isBookingDepositPaid(int customerId, int quotationId)
+    {
+        for(Hall hall : getHalls())
+        {
+            for(Quotation quotation : hall.getQuotationByCustomerId(customerId))
+            {
+                if(quotation.getQuotationId() == quotationId) 
+                {
+                    return quotation.getDepositPaid();
+                }
+            }
+        }
+        return false;
+    }
+
     public void makeBooking(int customerId, int quotationId, String paymentType )
     {
         Quotation currQuotation = null;
@@ -642,8 +657,9 @@ public class EventController
                 }
             }
         }
-        double depositAmount = currQuotation.getFinalPrice()*(currHall.getDeposit()/100);
+        double depositAmount = currQuotation.getFinalPrice() * (currHall.getDeposit()/100);
         double balanceAmount = currQuotation.getFinalPrice() - depositAmount;
+        currQuotation.setDepositPaid(true);
         String receiptNo = new SimpleDateFormat("ddMMyyyyHHmmss").format(System.currentTimeMillis());
         receiptNo += customerId;
         Payment payment = new Payment(receiptNo,depositAmount, balanceAmount,paymentType,"PARTIAL");
@@ -656,8 +672,17 @@ public class EventController
         StringBuffer strBuf = new StringBuffer("");
         for(Hall hall : halls)
         {
-            if(hall.getCustomerQuotationDetails(userID, quotationID) != null)
-                System.out.println(hall.getCustomerQuotationDetails(userID, quotationID) );
+            for(Quotation quotation : hall.getQuotationByCustomerId(userID))
+            {
+                if(quotation.getQuotationId() == quotationID) 
+                {
+                    double depositAmount = quotation.getFinalPrice() * (hall.getDeposit()/100);
+                    strBuf.append("Hall Name: " + hall.getHallName() + "\nBooking Start Date: " 
+                    + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotation.getStartEventDateTime()) + "\nBooking End Date: " 
+                    + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotation.getEndEventDateTime()) + "\nTotal Price: " + quotation.getFinalPrice()
+                    + "\nDeposit Paid: " + depositAmount + "\nBalance: " + (quotation.getFinalPrice() - depositAmount));
+                }
+            }
         }
         return strBuf.toString();
     }

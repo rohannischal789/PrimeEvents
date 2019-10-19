@@ -135,6 +135,14 @@ public class EventController
         }
     }
 
+    private int getMaxQuotationId()
+    {
+        String fileData = readFile("quotations.txt");
+        String[] data = fileData.split("\\n"); // split data by new line character
+        String[] lastQuotation = data[data.length - 1].split(";");
+        return Integer.parseInt(lastQuotation[1]);
+    }
+
     public void sortUserByLoginStatus()
     {
         Collections.sort(getUsers(), new Comparator<User>()
@@ -523,7 +531,7 @@ public class EventController
     double finalPrice)
     {
         Hall selectedHall = getHallById(hallID);
-        selectedHall.addQuotation(1,startEventDate,endEventDate,noOfAttendees,eventType, requiresCatering == 'y' ? true : false,specialReq,
+        selectedHall.addQuotation(getMaxQuotationId()+1,startEventDate,endEventDate,noOfAttendees,eventType, requiresCatering == 'y' ? true : false,specialReq,
             finalPrice,"PENDING",getCustomerById(getUsers().get(0).getUserId()),hallID);
         writeToQuotationsFile("quotations.txt",true,true, selectedHall.getQuotations());
     }
@@ -542,11 +550,12 @@ public class EventController
             multiplier *= dayDiff; 
         double atendeesMul = 1;
         if(currentHall.getCapacity()>0)
-            atendeesMul = noOfAttendees/currentHall.getCapacity();
+            atendeesMul = (double)noOfAttendees/(double)currentHall.getCapacity();
         multiplier *= atendeesMul;
         double typeMul = requiresCatering == 'y' ?  atendeesMul : 0;
         multiplier += typeMul;
-        return currentHall.getPrice() * multiplier;
+        double scale = Math.pow(10, 2);
+        return Math.round((currentHall.getPrice() * multiplier) * scale) / scale;
     }
 
     public String getHallReviews(int hallID)
@@ -568,7 +577,7 @@ public class EventController
     public String getQuotationDetails(int userID, int quotationID)
     {
         StringBuffer strBuf = new StringBuffer("");
-        if(getUserRole(userID) == "CUSTOMER")
+        if(getUserRole(userID).equals("CUSTOMER"))
         {
             for(Hall hall : halls)
             {
@@ -586,6 +595,22 @@ public class EventController
             }
         }
         return strBuf.toString();
+    }
+
+    public boolean isQuotationAccepted(int quotationID)
+    {
+        for(Hall hall : halls)
+        {
+            for(Quotation quotation :hall.getQuotations())
+            {
+                if(quotation.getQuotationId() == quotationID && quotation.getQuotationStatus().equals("ACCEPTED"))
+                {
+                    return true;
+                }
+
+            }
+        }
+        return false;
     }
 
     public void makeBooking(int customerId, int quotationId, String paymentType )
@@ -642,6 +667,42 @@ public class EventController
             if(hall.getOwner().getUserId() == userID)
                 if(hall.getQuotationRequestsByID(quotationID) != null)
                     hall.getQuotationById(quotationID).setQuotationStatus(status);
+        }
+    }
+
+    public String getPaymentsForOwner()
+    {
+        StringBuffer strBuf = new StringBuffer("");
+        for(Booking booking : bookings)
+        {
+            strBuf.append(booking.getBookingDetails());
+        }
+        return strBuf.toString();
+    }
+
+    public String getPaymentDetails(int quotationID)
+    {
+        StringBuffer strBuf = new StringBuffer("");
+        for(Booking booking : bookings)
+        {
+            if(booking.getQuotation().getQuotationId() == quotationID)
+            {
+                strBuf.append(booking.getBookingDetails());
+                break;
+            }
+        }
+        return strBuf.toString();
+    }
+
+    public void updatePaymentnStatus(int quotationID, String status)
+    {
+        for(Booking booking : bookings)
+        {
+            if(booking.getQuotation().getQuotationId() == quotationID)
+            {
+                booking.getPayment().setPaymentStatus(status);
+                break;
+            }
         }
     }
 

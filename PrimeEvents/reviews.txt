@@ -7,7 +7,7 @@
 13;innovate holistic bandwidth;1;3
 5;mesh enterprise partnerships;9;2
 11;harness interactive networks;1;3
-11;strategize B2C e-markets;2;1
+11;strategize B2C e-markets;2;2
 6;orchestrate open-source architectures;2;2
 6;grow world-class deliverables;1;2
 8;extend innovative e-services;3;5
@@ -18,7 +18,7 @@
 2;harness user-centric action-items;1;2
 20;innovate distributed e-commerce;4;4
 15;mesh holistic supply-chains;4;2
-11;scale seamless infrastructures;3;1
+11;scale seamless infrastructures;3;3
 11;matrix wireless action-items;2;3
 14;engineer mission-critical vortals;3;4
 17;visualize frictionless networks;2;3

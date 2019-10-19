@@ -73,6 +73,11 @@ public class PrimeEvent
         displayHeader("REGISTRATION");
         getEvent().fetchUsersData();
         boolean isValid = false;
+        String regexName = "(?i)(^[a-z])((?![ .,'-]$)[a-z .,'-]){0,24}$";
+        String regexDate = "^([0-2][0-9]||3[0-1])/(0[0-9]||1[0-2])/([0-9][0-9])[0-9][0-9]$";
+        String regexPhoneNumber = "^[+]{1}[0-9]{11}$";
+        String regexEmail = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
+        String regexPassword = "^.*(?=.{8,})(?=..*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$";
         while(!isValid)
         {
             switch(acceptIntegerInput("1. Customer\n2. Owner\nEnter your choice:"))
@@ -80,23 +85,72 @@ public class PrimeEvent
                 case 1:
                 isValid = true;
                 String fname = acceptStringInput("Enter your first name");
+                while(fname.matches(regexName) != true){
+                    System.out.println("Please enter a valid first name");
+                    fname = acceptStringInput("Enter your first name");                                    
+                }
                 String lname = acceptStringInput("Enter your last name");
+                while(lname.matches(regexName) != true){
+                    System.out.println("Please enter a valid last name");
+                    lname = acceptStringInput("Enter your last name");                                    
+                }
                 String dob = acceptStringInput("Enter your date of birth (dd/MM/yyyy)");
+                while(dob.matches(regexDate) != true){
+                    System.out.println("Please enter a valid date in the format dd/mm/yyyy");
+                    dob = acceptStringInput("Enter your date of birth (dd/MM/yyyy)");                                    
+                }
                 String phone = acceptStringInput("Enter your phone no");
+                while(phone.matches(regexPhoneNumber) != true){
+                    System.out.println("Please enter a valid phone number which is in the format +61*********");
+                    phone = acceptStringInput("Enter your phone no");                                    
+                }
                 String isVet = acceptStringInput("Are you a veteran (Y/N)");
+                while(!(isVet.equalsIgnoreCase("Y")  || isVet.equalsIgnoreCase("N"))){
+                    System.out.println("Please enter a valid veteran input");
+                    isVet = acceptStringInput("Are you a veteran (Y/N)");                                    
+                }
                 String email = acceptStringInput("Enter your email");
+                while(email.matches(regexEmail) != true){
+                    System.out.println("Please enter a valid email address");
+                    email = acceptStringInput("Enter your email"); 
+                }
                 String password = acceptStringInput("Enter your password");
+                while(password.matches(regexPassword) != true){
+                    System.out.println("At least 8 chars \n Contains at least one digit \n Contains at least one lower alpha char and one upper alpha char \n Contains at least one special character ");
+                    password = acceptStringInput("Enter your password");
+                }
                 getEvent().addUser(fname,lname,phone,email,password,"CUSTOMER");
                 System.out.println(fname + ", you've been successfully registered to Prime events. Kindly login to continue..");
                 displayLogin();
                 break;
+
                 case 2:
                 isValid = true;
                 String firstname = acceptStringInput("Enter your first name");
+                while(firstname.matches(regexName) != true){
+                    System.out.println("Please enter a valid first name");
+                    firstname = acceptStringInput("Enter your first name");                                    
+                }
                 String lastname = acceptStringInput("Enter your last name");
+                while(lastname.matches(regexName) != true){
+                    System.out.println("Please enter a valid last name");
+                    lastname = acceptStringInput("Enter your last name");                                    
+                }
                 String phone1 = acceptStringInput("Enter your phone no");
+                while(phone1.matches(regexPhoneNumber) != true){
+                    System.out.println("Please enter a valid phone number which is in the format +61*********");
+                    phone1 = acceptStringInput("Enter your phone no");                                    
+                }
                 String email1 = acceptStringInput("Enter your email");
+                while(email1.matches(regexEmail) != true){
+                    System.out.println("Please enter a valid email address");
+                    email1 = acceptStringInput("Enter your email"); 
+                }
                 String password1 = acceptStringInput("Enter your password");
+                while(password1.matches(regexPassword) != true){
+                    System.out.println("Your password is not valid it should contain minimum eight characters, at least one uppercase letter, one lowercase letter and one number:");
+                    password1 = acceptStringInput("Enter your password");
+                }
                 getEvent().addUser(firstname,lastname,phone1,email1,password1,"OWNER");
                 System.out.println(firstname + ", you've been successfully registered to Prime events as an Owner. Kindly login to continue..");
                 displayLogin();
@@ -112,10 +166,15 @@ public class PrimeEvent
         displayHeader("LOGIN");
         getEvent().fetchUsersData();
         String email = acceptStringInput("Enter your email");
+        String regexEmail = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
+        while(email.matches(regexEmail) != true){
+            System.out.println("Please enter valid email address");
+            email = acceptStringInput("Enter your email");
+        }
         String password = acceptStringInput("Enter your password");
         if(getEvent().isValidCredentials(email,password))
         {
-            System.out.println("Login Successful!!");
+            System.out.println("Login Successful!! Welcome to Prime Events");
             displayHome();
         }
         else
@@ -171,7 +230,7 @@ public class PrimeEvent
                     //showManageHalls(); 
                     break;
                     case 2: isValid = true; break;
-                    case 3: isValid = true; break;
+                    case 3: isValid = true; displayPayments(userId); break;
                     case 4: isValid = true; break;
                     case 5: isValid = true; displayQuotationRequests(userId); break;
                     case 0: isValid = true; 
@@ -254,7 +313,6 @@ public class PrimeEvent
     private void promptForKey()
     {
         Scanner sc = new Scanner(System.in);
-        System.out.println("Press any key to try again");
         sc.nextLine();   
     }
 
@@ -327,7 +385,7 @@ public class PrimeEvent
             }
             catch(ParseException ex)
             {
-
+                System.out.println("Invalid Datetime format entered");
             }
         }
         isValid = false;
@@ -346,7 +404,7 @@ public class PrimeEvent
             }
             catch(ParseException ex)
             {
-
+                System.out.println("Invalid Datetime format entered");
             }
         }
         isValid = false;
@@ -358,6 +416,10 @@ public class PrimeEvent
             {
                 isValid = true;
             }
+            else
+            {
+                System.out.println("Total number of atendees should be less than the hall's capacity");
+            }
         }
         isValid = false;
         String eventType = "";
@@ -367,6 +429,10 @@ public class PrimeEvent
             if(getEvent().getHallById(id).getEventTypes().contains(eventType.toLowerCase()))
             {
                 isValid = true;
+            }
+            else
+            {
+                System.out.println("Invalid event type entered. Kindly choose from any of the available options");
             }
         }
         char requiresCatering = acceptStringInput("Do you require Catering by us(y/n):").toLowerCase().charAt(0);
@@ -410,153 +476,171 @@ public class PrimeEvent
     {
         displayHeader("VIEW REVIEWS");
         String hallReviews = getEvent().getHallReviews(hallID);
-        if(hallReviews != "")
+        if(!hallReviews.equals(""))
         {
             System.out.println(getEvent().getHallById(hallID).displayShort());
             System.out.println("\nREVIEWS:\n");
             System.out.println(hallReviews);
+            boolean isValid = false;
+            System.out.println("\nOptions:");
+            while(!isValid)
+            {
+                char goBack = acceptStringInput("B. Go Back\nEnter your choice:").toLowerCase().charAt(0);
+                switch(goBack)
+                {
+                    case 'b': 
+                    isValid = true; 
+                    displayHallDetails(hallID);
+                    break;
+                    default:
+                    System.out.println("Invalid choice. Please try again!");
+                }
+            }
         }
         else
         {
-            System.out.println("There are no reviews currently for the hall");
+            System.out.println("There are no reviews currently for the hall! Press any key to go back");
+            promptForKey();
+            displayHallDetails(hallID);
         }
-        boolean isValid = false;
-        System.out.println("\nOptions:");
-        while(!isValid)
-        {
-            char goBack = acceptStringInput("B. Go Back\nEnter your choice:").toLowerCase().charAt(0);
-            switch(goBack)
-            {
-                case 'b': 
-                isValid = true; 
-                displayHallDetails(hallID);
-                break;
-                default:
-                System.out.println("Invalid choice. Please try again!");
-            }
-        }
+
     }
 
     private void displayQuotationResponse(int customerID)
     {
         displayHeader("QUOTATION RESPONSES");
         String quotationResponse = getEvent().getQuotationResponse(customerID);
-        if(quotationResponse != "")
+        if(!quotationResponse.equals(""))
         {
             System.out.println(quotationResponse);
-        }
-        else
-        {
-            System.out.println("You have not made any quotations yet");
-        }
-        System.out.println();
-        boolean isValid = false;
-        System.out.println("\nOptions:");
-        while(!isValid)
-        {
-            String choice = acceptStringInput("\nEnter number to view accepted quotation and pay deposit"+
-                    "\n----OR-----\nB. Go back\nEnter your choice:").toLowerCase();
-            if(isInteger(choice) && Integer.parseInt(choice) != 0)
+            boolean isValid = false;
+            System.out.println("\nOptions:");
+            while(!isValid)
             {
-                isValid = true;
-                displayQuotationDetail(customerID ,Integer.parseInt(choice));
-            }
-            else
-            {
-                char selectInput = choice.toLowerCase().charAt(0);
-                switch(selectInput)
+                String choice = acceptStringInput("\nEnter number to view accepted quotation and pay deposit"+
+                        "\n----OR-----\nB. Go back\nEnter your choice:").toLowerCase();
+                if(isInteger(choice) && Integer.parseInt(choice) != 0)
                 {
-                    case 'b': 
-                    isValid = true; 
-                    displayHome(); 
-                    break;
-                    default:
-                    System.out.println("Invalid choice. Please try again!");
+                    isValid = true;
+                    displayQuotationDetail(customerID ,Integer.parseInt(choice));
+                }
+                else
+                {
+                    char selectInput = choice.toLowerCase().charAt(0);
+                    switch(selectInput)
+                    {
+                        case 'b': 
+                        isValid = true; 
+                        displayHome(); 
+                        break;
+                        default:
+                        System.out.println("Invalid choice. Please try again!");
+                    }
                 }
             }
         }
+        else
+        {
+            System.out.println("You have not made any quotations yet! Press any key to go back");
+            promptForKey();
+            displayHome();
+        }        
     }
 
     private void displayQuotationDetail(int userID, int quotationID)
     {
         displayHeader("QUOTATION DETAILS");
         String quotationResponse = getEvent().getQuotationDetails(userID, quotationID);
-        if(quotationResponse != "")
+        if(!quotationResponse.equals(""))
         {
             System.out.println(quotationResponse);
-        }
-        else
-        {
-            System.out.println("Invalid quotation ID");
-        }
-        boolean isValid = false;
-        System.out.println("\nOptions:");
-        if(getEvent().getUserRole(userID) == "CUSTOMER")
-        {
-            while(!isValid)
+            boolean isValid = false;
+            
+            if(getEvent().getUserRole(userID).equals("CUSTOMER"))
             {
-                char choice = acceptStringInput("1. Pay deposit\nB. Go Back to Quotation Responses\nEnter your choice:").charAt(0);
-                switch(choice)
+                while(!isValid)
                 {
-                    case '1': isValid = true; displayPayDeposit(userID, quotationID); break;
-                    case 'b': isValid = true; displayQuotationResponse(userID); break;
-                    default:
-                    System.out.println("Invalid choice. Please try again!");
+                    if(getEvent().isQuotationAccepted(quotationID))
+                    {
+                        System.out.println("\nOptions:");
+                        char choice = acceptStringInput("1. Pay deposit\nB. Go Back to Quotation Responses\nEnter your choice:").charAt(0);
+                        switch(choice)
+                        {
+                            case '1': isValid = true; displayPayDeposit(userID, quotationID); break;
+                            case 'b': isValid = true; displayQuotationResponse(userID); break;
+                            default:
+                            System.out.println("Invalid choice. Please try again!");
+                        }
+                    }
+                    else
+                    {
+                        System.out.println("The quotation has not been accepted yet! Kindly wait for the hall owner to accept it and then proceed with the deposit. Press any key to go back");
+                        promptForKey();
+                        displayQuotationResponse(userID);
+                    }
+                }
+            }
+            else
+            {
+                
+                while(!isValid)
+                {
+                    char choice = acceptStringInput("1. Accept Quotation\n2. Reject Quotation\nB. Go Back\nEnter your choice:").charAt(0);
+                    switch(choice)
+                    {
+                        case '1': isValid = true; 
+                        char accept = acceptStringInput("Do you want to accept the quotation(y/n)?").charAt(0);
+                        switch(accept)
+                        {
+                            case 'y':
+                            isValid = true;
+                            getEvent().updateQuotationStatus(userID, quotationID, "ACCEPTED");
+                            System.out.println("Quotation accepted!! The requester can now book the hall");
+                            displayQuotationRequests(userID);
+                            break;
+                            case 'n':
+                            isValid = true;
+                            System.out.println("Action cancelled!! Going back to Quotation details");
+                            displayQuotationDetail(userID, quotationID);
+                            break;
+                            default:
+                            System.out.println("Invalid choice. Please try again!");
+                        }
+                        break;
+                        case '2': isValid = true;
+                        char input = acceptStringInput("Do you want to reject the quotation(y/n)?").charAt(0);
+                        switch(input)
+                        {
+                            case 'y':
+                            isValid = true;
+                            getEvent().updateQuotationStatus(userID, quotationID, "REJECTED");
+                            displayQuotationRequests(userID);
+                            System.out.println("Quotation rejected!!");
+                            break;
+                            case 'n':
+                            isValid = true;
+                            System.out.println("Action cancelled!! Going back to Quotation details");
+                            displayQuotationDetail(userID, quotationID);
+                            break;
+                            default:
+                            System.out.println("Invalid choice. Please try again!");
+                        }
+                        break;
+                        case 'b': isValid = true; 
+                        displayQuotationResponse(userID); break;
+                        default:
+                        System.out.println("Invalid choice. Please try again!");
+                    }
                 }
             }
         }
         else
         {
-            while(!isValid)
-            {
-                char choice = acceptStringInput("1. Accept Quotation\n2. Reject Quotation\nB. Go Back\nEnter your choice:").charAt(0);
-                switch(choice)
-                {
-                    case '1': isValid = true; 
-                    char accept = acceptStringInput("Do you want to accept the quotation(y/n)?").charAt(0);
-                    switch(accept)
-                    {
-                        case 'y':
-                        isValid = true;
-                        getEvent().updateQuotationStatus(userID, quotationID, "ACCEPTED");
-                        System.out.println("Quotation accepted!! The requester can now book the hall");
-                        displayQuotationRequests(userID);
-                        break;
-                        case 'n':
-                        isValid = true;
-                        System.out.println("Action cancelled!! Going back to Quotation details");
-                        displayQuotationDetail(userID, quotationID);
-                        break;
-                        default:
-                        System.out.println("Invalid choice. Please try again!");
-                    }
-                    break;
-                    case '2': isValid = true;
-                    char input = acceptStringInput("Do you want to reject the quotation(y/n)?").charAt(0);
-                    switch(input)
-                    {
-                        case 'y':
-                        isValid = true;
-                        getEvent().updateQuotationStatus(userID, quotationID, "REJECTED");
-                        displayQuotationRequests(userID);
-                        System.out.println("Quotation rejected!!");
-                        break;
-                        case 'n':
-                        isValid = true;
-                        System.out.println("Action cancelled!! Going back to Quotation details");
-                        displayQuotationDetail(userID, quotationID);
-                        break;
-                        default:
-                        System.out.println("Invalid choice. Please try again!");
-                    }
-                    break;
-                    case 'b': isValid = true; 
-                    displayQuotationRequests(userID); break;
-                    default:
-                    System.out.println("Invalid choice. Please try again!");
-                }
-            }
+            System.out.println("Invalid quotation ID! Press any key to go back");
+            promptForKey();
+            displayQuotationResponse(userID);
         }
+
     }
 
     private void displayPayDeposit(int customerID, int quotationID)
@@ -682,13 +766,108 @@ public class PrimeEvent
         }
     }
 
-    private void displayPayments()
+    private void displayPayments(int ownerID)
     {
-
+        displayHeader("MANAGE PAYMENTS");
+        String payments = getEvent().getPaymentsForOwner();
+        if(payments.trim() != "")
+        {
+            System.out.println(payments);
+        }
+        else
+        {
+            System.out.println("There are no payments done for any of your halls yet");
+        }
+        boolean isValid = false;
+        System.out.println("\nOptions:");
+        while(!isValid)
+        {
+            String choice = acceptStringInput("Enter number to view payment details"+
+                    "\n----OR-----\nB. Go back\nEnter your choice:").toLowerCase();
+            if(isInteger(choice) && Integer.parseInt(choice) != 0)
+            {
+                isValid = true;
+                displayPaymentDetail(ownerID ,Integer.parseInt(choice));
+            }
+            else
+            {
+                char selectInput = choice.toLowerCase().charAt(0);
+                switch(selectInput)
+                {
+                    case 'b': 
+                    isValid = true; 
+                    displayHome(); 
+                    break;
+                    default:
+                    System.out.println("Invalid choice. Please try again!");
+                }
+            }
+        }
     }
 
-    private void displayPaymentInfo()
+    private void displayPaymentDetail(int userID, int quotationID)
     {
+        displayHeader("PAYMENT DETAILS");
+        String paymentDetail = getEvent().getPaymentDetails(quotationID);
+        if(paymentDetail != "")
+        {
+            System.out.println(paymentDetail);
+        }
+        else
+        {
+            System.out.println("Invalid payment ID");
+        }
+        boolean isValid = false;
+        System.out.println("\nOptions:");
+        while(!isValid)
+        {
+            char choice = acceptStringInput("1. Accept Payment\n2. Reject Payment\nB. Go Back\nEnter your choice:").charAt(0);
+            switch(choice)
+            {
+                case '1': isValid = true; 
+                char accept = acceptStringInput("Do you want to accept the payment(y/n)?").charAt(0);
+                switch(accept)
+                {
+                    case 'y':
+                    isValid = true;
+                    getEvent().updatePaymentnStatus(quotationID, "ACCEPTED");
+                    System.out.println("Payment accepted!!");
+                    displayPayments(userID);
+                    break;
+                    case 'n':
+                    isValid = true;
+                    System.out.println("Action cancelled!! Going back to Payment details");
+                    displayPaymentDetail(userID,quotationID);
+                    break;
+                    default:
+                    System.out.println("Invalid choice. Please try again!");
+                }
+                break;
+                case '2': isValid = true;
+                char input = acceptStringInput("Do you want to reject the payment(y/n)?").charAt(0);
+                switch(input)
+                {
+                    case 'y':
+                    isValid = true;
+                    getEvent().updatePaymentnStatus(quotationID, "REJECTED");
+                    displayPayments(userID);
+                    System.out.println("Quotation rejected!!");
+                    break;
+                    case 'n':
+                    isValid = true;
+                    System.out.println("Action cancelled!! Going back to Quotation details");
+                    displayPaymentDetail(userID,quotationID);
+                    break;
+                    default:
+                    System.out.println("Invalid choice. Please try again!");
+                }
+                break;
+                case 'b': isValid = true; 
+                displayPayments(userID); break;
+                default:
+                System.out.println("Invalid choice. Please try again!");
+            }
+        }
 
     }
 

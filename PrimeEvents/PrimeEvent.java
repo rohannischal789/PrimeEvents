@@ -3,10 +3,12 @@ import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.text.ParseException; 
 /**
- * Write a description of class PrimeEvent here.
- *
- * @author (your name)
- * @version (a version number or a date)
+ * PrimeEvent is the boundary class for the system.
+ * It contains the start method which is used to run it. It also has private methods which are used internally.
+ * The main functionality is to display to the screen and validate inputs.
+ * It communicates directly with the EventController class.
+ * @author Rohan Nischal,Guanting Chen,Swathi Jadhav
+ * @version 19-10-2019
  */
 public class PrimeEvent
 {
@@ -21,7 +23,7 @@ public class PrimeEvent
 
     /**
      * Returns value of event
-     * @return
+     * @return EventController object
      */
     public EventController getEvent() {
         return event;
@@ -29,17 +31,25 @@ public class PrimeEvent
 
     /**
      * Sets new value of event
-     * @param
+     * @param EventController object
      */
     public void setEvent(EventController event) {
         this.event = event;
     }
 
+    /**
+     * Method start
+     * This method is used to run the system. 
+     */
     public void start()
     {
         showMenu();
     }
 
+    /**
+     * Method showMenu
+     * This method displays the menu on the screen and prompts for input from the user in order to navigate to a screen
+     */
     private void showMenu()
     {
         displayHeader("PRIME EVENTS");
@@ -68,6 +78,10 @@ public class PrimeEvent
         }
     }
 
+    /**
+     * Method displayRegistration
+     * This method is used to display and validate the registration process
+     */
     private void displayRegistration()
     {
         displayHeader("REGISTRATION");
@@ -161,6 +175,10 @@ public class PrimeEvent
         }
     }
 
+    /**
+     * Method displayLogin
+     * This method is used to prompt for and validate login credentials
+     */
     private void displayLogin()
     {
         displayHeader("LOGIN");
@@ -183,6 +201,10 @@ public class PrimeEvent
         }
     }
 
+    /**
+     * Method displayHome
+     * This method displays the home screen according to the user's role on the screen and prompts for input from the user in order to navigate to a screen
+     */
     private void displayHome()
     {
         getEvent().initializeData();
@@ -204,10 +226,10 @@ public class PrimeEvent
                     displayQuotationResponse(userId); 
                     break;
                     case 3: isValid = true;
-                    //manageBooking(); 
+                    displayUnderImplementation(); 
                     break;
                     case 4: isValid = true;
-                    //showReviewHall(); 
+                    displayUnderImplementation(); 
                     break;
                     case 0: isValid = true;
                     displayLogout(); 
@@ -227,11 +249,11 @@ public class PrimeEvent
                 switch(input)
                 {
                     case 1: isValid = true; 
-                    //showManageHalls(); 
+                    displayUnderImplementation(); 
                     break;
-                    case 2: isValid = true; break;
+                    case 2: isValid = true; displayUnderImplementation(); break;
                     case 3: isValid = true; displayPayments(userId); break;
-                    case 4: isValid = true; break;
+                    case 4: isValid = true; displayUnderImplementation(); break;
                     case 5: isValid = true; displayQuotationRequests(userId); break;
                     case 0: isValid = true; 
                     displayLogout(); 
@@ -256,6 +278,7 @@ public class PrimeEvent
                     break;
                     case 2: 
                     isValid = true; 
+                    displayUnderImplementation();
                     break;
                     case 0: 
                     isValid = true; 
@@ -268,6 +291,11 @@ public class PrimeEvent
         }
     }
 
+    /**
+     * Method displayManageUsers
+     * This method displays the manage users option for the administrator.
+     * It displays the entire list of users and prompts to select one.
+     */
     private void displayManageUsers()
     {
         displayHeader("MANAGE USERS");
@@ -309,6 +337,12 @@ public class PrimeEvent
         }  
     }
 
+    /**
+     * Method displayUserDetails
+     * This method is used to print a single user's details on the screen.
+     * Also, it gives an option to lock or unlock user based on the user's locked out state.
+     * @param userID A parameter
+     */
     private void displayUserDetails(int userID)
     {
         displayHeader("SELECT USER");
@@ -350,6 +384,12 @@ public class PrimeEvent
         displayManageUsers();
     }
 
+    /**
+     * Method displayAllHalls
+     * This method displays all the filtered halls for search hall feature. It also provides options to navigate to view hall and filter hall.
+     * @param suburbName the name of the suburb to filter with
+     * @param eventType the event type to filter with
+     */
     private void displayAllHalls(String suburbName, String eventType)
     {
         displayHeader("SEARCH HALLS");
@@ -396,12 +436,21 @@ public class PrimeEvent
 
     }
 
+    /**
+     * Method promptForKey
+     * This method simply prompts for the enter key
+     */
     private void promptForKey()
     {
         Scanner sc = new Scanner(System.in);
         sc.nextLine();   
     }
 
+    /**
+     * Method displayFilterHalls
+     * This method is used to display the filter hall option
+     * It gives the options to filter by suburb or event type.
+     */
     private void displayFilterHalls()
     {
         displayHeader("FILTER HALLS");
@@ -430,6 +479,12 @@ public class PrimeEvent
         displayAllHalls(searchSuburb, searchEvent);
     }
 
+    /**
+     * Method displayHallDetails
+     * This method is used to display a particular hall's details.
+     * It gives options to navigate to request quotation and view reviews
+     * @param hallID the id of a hall
+     */
     private void displayHallDetails(int hallID)
     {
         displayHeader("VIEW HALL");
@@ -452,6 +507,12 @@ public class PrimeEvent
 
     }
 
+    /**
+     * Method displayRequestForQuotation
+     * This method is used to display request quotation screen.
+     * It prompts and validates for all the quotation details
+     * @param id the selected hall id
+     */
     private void displayRequestForQuotation(int id)
     {
         displayHeader("REQUEST QUOTATION");
@@ -549,6 +610,12 @@ public class PrimeEvent
         displayAllHalls("","");
     }
 
+    /**
+     * Method isDateAfterToday
+     * this method checks if a date is after the current date
+     * @param inputDate A date to compare
+     * @return true if after the current date or false if before
+     */
     private boolean isDateAfterToday(Date inputDate)
     {
         Date currentDate = new Date();      
@@ -558,6 +625,11 @@ public class PrimeEvent
             return false;
     }
 
+    /**
+     * Method displayHallReviews
+     * This method is used to display the view reviews screen
+     * @param hallID the selected hall id
+     */
     private void displayHallReviews(int hallID)
     {
         displayHeader("VIEW REVIEWS");
@@ -592,6 +664,11 @@ public class PrimeEvent
 
     }
 
+    /**
+     * Method displayQuotationResponse
+     * this method is used to display the quotation response screen.
+     * @param customerID the current customer id
+     */
     private void displayQuotationResponse(int customerID)
     {
         displayHeader("QUOTATION RESPONSES");
@@ -633,6 +710,14 @@ public class PrimeEvent
         }        
     }
 
+    /**
+     * Method displayQuotationDetail
+     * this method is used to display a particular quotation's detail.
+     * For the customer, it prompts to pay the deposit if the quotation has been accepted.
+     * For the owner, it prompts to accept or reject a quotation.
+     * @param userID the current user's id
+     * @param quotationID the selected quotation id
+     */
     private void displayQuotationDetail(int userID, int quotationID)
     {
         displayHeader("QUOTATION DETAILS");
@@ -751,6 +836,13 @@ public class PrimeEvent
 
     }
 
+    /**
+     * Method displayPayDeposit
+     * This method displays the pay deposit screen.
+     * It prompts to pay by cash or card and interacts with EventController to make a booking
+     * @param customerID the current customer's id
+     * @param quotationID the selected quotation id
+     */
     private void displayPayDeposit(int customerID, int quotationID)
     {
         displayHeader("PAY DEPOSIT");
@@ -813,7 +905,12 @@ public class PrimeEvent
         }
     }
 
-    // to update
+    /**
+     * Method displayReceipt
+     * This method is used to display the receipt.
+     * @param customerID The current customer's id
+     * @param quotationID The selected quotation id
+     */
     private void displayReceipt(int customerID, int quotationID)
     {
         displayHeader("VIEW RECEIPT");
@@ -835,6 +932,12 @@ public class PrimeEvent
         }
     }
 
+    /**
+     * Method displayQuotationRequests
+     * This method displays all the quotation requests.
+     * It also prompts to view a particular quotation's details
+     * @param ownerID the current owner's id
+     */
     private void displayQuotationRequests(int ownerID)
     {
         displayHeader("QUOTATION REQUESTS");
@@ -874,6 +977,12 @@ public class PrimeEvent
         }
     }
 
+    /**
+     * Method displayPayments
+     * This method is used to display the manage payments option.
+     * It also prompts to select a particular payment
+     * @param ownerID the current owner's id
+     */
     private void displayPayments(int ownerID)
     {
         displayHeader("MANAGE PAYMENTS");
@@ -913,6 +1022,13 @@ public class PrimeEvent
         }
     }
 
+    /**
+     * Method displayPaymentDetail
+     * This method is used to display a particular payment's detail.
+     * It also prompts to accept and reject payment
+     * @param userID the current user id
+     * @param quotationID the selected quotation id
+     */
     private void displayPaymentDetail(int userID, int quotationID)
     {
         displayHeader("PAYMENT DETAILS");
@@ -985,11 +1101,10 @@ public class PrimeEvent
 
     }
 
-    public void askForConfirmation()
-    {
-
-    }
-
+    /**
+     * Method displayLogout
+     * This method displays the logout option and interacts with EventController to do the same.
+     */
     public void displayLogout()
     {
         char input = acceptStringInput("Are you sure you want to log out(y/n)").toLowerCase().charAt(0);
@@ -1013,7 +1128,21 @@ public class PrimeEvent
             }
         }
     }
+    
+    public void displayUnderImplementation()
+    {
+        displayHeader("UNDER IMPLEMENTATION");
+        System.out.println("This functionality is not a part of the additional functionalitites. Press enter to go back to home");
+        promptForKey();
+        displayHome();
+    }
 
+    /**
+     * Method acceptStringInput
+     * This method uses a scanner to trim and accept a string input (not empty)
+     * @param displayMessage The message to display before prompting
+     * @return The entered value by the user
+     */
     private String acceptStringInput(String displayMessage)
     {
         Scanner console = new Scanner(System.in);
@@ -1027,6 +1156,12 @@ public class PrimeEvent
         return input;
     }
 
+    /**
+     * Method acceptIntegerInput
+     * This method uses a scanner to accept only an integer input
+     * @param displayMessage The message to display before prompting
+     * @return The entered int value by the user
+     */
     private int acceptIntegerInput(String displayMessage)
     {
         Scanner console = new Scanner(System.in);
@@ -1039,6 +1174,12 @@ public class PrimeEvent
         return console.nextInt();
     }
 
+    /**
+     * Method isInteger
+     * This method is used to check a string value can be parsed to an integer
+     * @param s The string value
+     * @return true if string could be an integer, false if not
+     */
     private boolean isInteger(String s)
     {
         try 
@@ -1056,6 +1197,11 @@ public class PrimeEvent
         return true;
     }
 
+    /**
+     * Method displayHeader
+     * This method displays the header to the screen
+     * @param header The screen name to display
+     */
     private void displayHeader(String header)
     {
         System.out.println("\n***********************************");

@@ -84,94 +84,130 @@ public class PrimeEvent
      */
     private void displayRegistration()
     {
-        displayHeader("REGISTRATION");
-        getEvent().fetchUsersData();
-        boolean isValid = false;
-        String regexName = "(?i)(^[a-z])((?![ .,'-]$)[a-z .,'-]){0,24}$";
-        String regexDate = "^([0-2][0-9]||3[0-1])/(0[0-9]||1[0-2])/([0-9][0-9])[0-9][0-9]$";
-        String regexPhoneNumber = "^[+]{1}[0-9]{11}$";
-        String regexEmail = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
-        String regexPassword = "^.*(?=.{8,})(?=..*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$";
-        while(!isValid)
+        try
         {
-            switch(acceptIntegerInput("1. Customer\n2. Owner\nEnter your choice:"))
+            displayHeader("REGISTRATION");
+            getEvent().fetchUsersData();
+            boolean isValid = false;
+            String regexName = "(?i)(^[a-z])((?![ .,'-]$)[a-z .,'-]){0,24}$";
+            String regexDate = "^([0-2][0-9]||3[0-1])/(0[0-9]||1[0-2])/([0-9][0-9])[0-9][0-9]$";
+            String regexPhoneNumber = "^[+]{1}[0-9]{11}$";
+            String regexEmail = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
+            String regexPassword = "^.*(?=.{8,})(?=..*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$";
+            while(!isValid)
             {
-                case 1:
-                isValid = true;
-                String fname = acceptStringInput("Enter your first name");
-                while(fname.matches(regexName) != true){
-                    System.out.println("Please enter a valid first name");
-                    fname = acceptStringInput("Enter your first name");                                    
-                }
-                String lname = acceptStringInput("Enter your last name");
-                while(lname.matches(regexName) != true){
-                    System.out.println("Please enter a valid last name");
-                    lname = acceptStringInput("Enter your last name");                                    
-                }
-                String dob = acceptStringInput("Enter your date of birth (dd/MM/yyyy)");
-                while(dob.matches(regexDate) != true){
-                    System.out.println("Please enter a valid date in the format dd/mm/yyyy");
-                    dob = acceptStringInput("Enter your date of birth (dd/MM/yyyy)");                                    
-                }
-                String phone = acceptStringInput("Enter your phone no");
-                while(phone.matches(regexPhoneNumber) != true){
-                    System.out.println("Please enter a valid phone number which is in the format +61*********");
-                    phone = acceptStringInput("Enter your phone no");                                    
-                }
-                String isVet = acceptStringInput("Are you a veteran (Y/N)");
-                while(!(isVet.equalsIgnoreCase("Y")  || isVet.equalsIgnoreCase("N"))){
-                    System.out.println("Please enter a valid veteran input");
-                    isVet = acceptStringInput("Are you a veteran (Y/N)");                                    
-                }
-                String email = acceptStringInput("Enter your email");
-                while(email.matches(regexEmail) != true){
-                    System.out.println("Please enter a valid email address");
-                    email = acceptStringInput("Enter your email"); 
-                }
-                String password = acceptStringInput("Enter your password");
-                while(password.matches(regexPassword) != true){
-                    System.out.println("At least 8 chars \n Contains at least one digit \n Contains at least one lower alpha char and one upper alpha char \n Contains at least one special character ");
-                    password = acceptStringInput("Enter your password");
-                }
-                getEvent().addUser(fname,lname,phone,email,password,"CUSTOMER");
-                System.out.println(fname + ", you've been successfully registered to Prime events. Kindly login to continue..");
-                displayLogin();
-                break;
+                switch(acceptIntegerInput("1. Customer\n2. Owner\n0. Go Back\nEnter your choice:"))
+                {
+                    case 1:
+                    isValid = true;
+                    String fname = acceptStringInput("Enter your first name");
+                    while(fname.matches(regexName) != true){
+                        System.out.println("Please enter a valid first name");
+                        fname = acceptStringInput("Enter your first name");                                    
+                    }
+                    String lname = acceptStringInput("Enter your last name");
+                    while(lname.matches(regexName) != true){
+                        System.out.println("Please enter a valid last name");
+                        lname = acceptStringInput("Enter your last name");                                    
+                    }
+                    String dob = acceptStringInput("Enter your date of birth (dd/MM/yyyy)");
+                    while(dob.matches(regexDate) != true || !isDateBeforeToday( new SimpleDateFormat("dd/MM/yyyy").parse(dob))){
+                        if(!isDateBeforeToday( new SimpleDateFormat("dd/MM/yyyy").parse(dob)))
+                        {
+                            System.out.println("Entered date should be before today's date");
+                        }
+                        else
+                        {
+                            System.out.println("Please enter a valid date in the format dd/mm/yyyy");
+                        }
+                        dob = acceptStringInput("Enter your date of birth (dd/MM/yyyy)");                                    
+                    }
+                    String phone = acceptStringInput("Enter your phone no");
+                    while(phone.matches(regexPhoneNumber) != true){
+                        System.out.println("Please enter a valid phone number which is in the format +61*********");
+                        phone = acceptStringInput("Enter your phone no");                                    
+                    }
+                    String isVet = acceptStringInput("Are you a veteran (Y/N)");
+                    while(!(isVet.equalsIgnoreCase("Y")  || isVet.equalsIgnoreCase("N"))){
+                        System.out.println("Please enter a valid veteran input");
+                        isVet = acceptStringInput("Are you a veteran (Y/N)");                                    
+                    }
+                    String email = acceptStringInput("Enter your email");
+                    while(email.matches(regexEmail) != true || getEvent().isEmailUsed(email)){
+                        if(getEvent().isEmailUsed(email))
+                        {
+                            System.out.println("Email is already registered with Prime Events");
+                        }
+                        else
+                        {
+                            System.out.println("Please enter a valid email address");
+                        }
+                        email = acceptStringInput("Enter your email"); 
+                    }
+                    String password = acceptStringInput("Enter your password");
+                    while(password.matches(regexPassword) != true){
+                        System.out.println("Password should contain at least 8 chars including: \nAt least one digit \nAt least one lower alpha char and one upper alpha char \nContains at least one special character ");
+                        password = acceptStringInput("Enter your password");
+                    }
+                    getEvent().addUser(fname,lname,phone,email,password,"CUSTOMER");
+                    System.out.println(fname + ", you've been successfully registered to Prime events. Kindly login to continue..");
+                    displayLogin();
+                    break;
 
-                case 2:
-                isValid = true;
-                String firstname = acceptStringInput("Enter your first name");
-                while(firstname.matches(regexName) != true){
-                    System.out.println("Please enter a valid first name");
-                    firstname = acceptStringInput("Enter your first name");                                    
+                    case 2:
+                    isValid = true;
+                    String firstname = acceptStringInput("Enter your first name");
+                    while(firstname.matches(regexName) != true){
+                        System.out.println("Please enter a valid first name");
+                        firstname = acceptStringInput("Enter your first name");                                    
+                    }
+                    String lastname = acceptStringInput("Enter your last name");
+                    while(lastname.matches(regexName) != true){
+                        System.out.println("Please enter a valid last name");
+                        lastname = acceptStringInput("Enter your last name");                                    
+                    }
+                    String phone1 = acceptStringInput("Enter your phone no");
+                    while(phone1.matches(regexPhoneNumber) != true){
+                        System.out.println("Please enter a valid phone number which is in the format +61*********");
+                        phone1 = acceptStringInput("Enter your phone no");                                    
+                    }
+                    String email1 = acceptStringInput("Enter your email");
+                    while(email1.matches(regexEmail) != true || getEvent().isEmailUsed(email1)){
+                        if(getEvent().isEmailUsed(email1))
+                        {
+                            System.out.println("Email is already registered with Prime Events");
+                        }
+                        else
+                        {
+                            System.out.println("Please enter a valid email address");
+                        }
+                        email1 = acceptStringInput("Enter your email"); 
+                    }
+                    while(getEvent().isEmailUsed(email1))
+                    {
+                        System.out.println("Email address is also registered with Prime Events");
+                        email = acceptStringInput("Enter your email"); 
+                    }
+                    String password1 = acceptStringInput("Enter your password");
+                    while(password1.matches(regexPassword) != true){
+                        System.out.println("Your password is not valid it should contain minimum eight characters, at least one uppercase letter, one lowercase letter and one number:");
+                        password1 = acceptStringInput("Enter your password");
+                    }
+                    getEvent().addUser(firstname,lastname,phone1,email1,password1,"OWNER");
+                    System.out.println(firstname + ", you've been successfully registered to Prime events as an Owner. Kindly login to continue..");
+                    displayLogin();
+                    break;
+                    case 0:
+                    showMenu();
+                    break;
+                    default:
+                    System.out.println("Invalid choice. Please try again");
                 }
-                String lastname = acceptStringInput("Enter your last name");
-                while(lastname.matches(regexName) != true){
-                    System.out.println("Please enter a valid last name");
-                    lastname = acceptStringInput("Enter your last name");                                    
-                }
-                String phone1 = acceptStringInput("Enter your phone no");
-                while(phone1.matches(regexPhoneNumber) != true){
-                    System.out.println("Please enter a valid phone number which is in the format +61*********");
-                    phone1 = acceptStringInput("Enter your phone no");                                    
-                }
-                String email1 = acceptStringInput("Enter your email");
-                while(email1.matches(regexEmail) != true){
-                    System.out.println("Please enter a valid email address");
-                    email1 = acceptStringInput("Enter your email"); 
-                }
-                String password1 = acceptStringInput("Enter your password");
-                while(password1.matches(regexPassword) != true){
-                    System.out.println("Your password is not valid it should contain minimum eight characters, at least one uppercase letter, one lowercase letter and one number:");
-                    password1 = acceptStringInput("Enter your password");
-                }
-                getEvent().addUser(firstname,lastname,phone1,email1,password1,"OWNER");
-                System.out.println(firstname + ", you've been successfully registered to Prime events as an Owner. Kindly login to continue..");
-                displayLogin();
-                break;
-                default:
-                System.out.println("Invalid choice. Please try again");
             }
+        }
+        catch(Exception ex)
+        {
+            System.out.println("Error");
         }
     }
 
@@ -183,6 +219,7 @@ public class PrimeEvent
     {
         displayHeader("LOGIN");
         getEvent().fetchUsersData();
+
         String email = acceptStringInput("Enter your email");
         String regexEmail = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
         while(email.matches(regexEmail) != true){
@@ -197,8 +234,17 @@ public class PrimeEvent
         }
         else
         {
-            displayLogin();
+            char choice = acceptStringInput("Do you wish to continue with login(y/n)?").toLowerCase().charAt(0);
+            if(choice == 'y')
+            {
+                displayLogin();
+            }
+            else
+            {
+                showMenu();
+            }
         }
+
     }
 
     /**
@@ -626,6 +672,21 @@ public class PrimeEvent
     }
 
     /**
+     * Method isDateBeforeToday
+     * this method checks if a date is before the current date
+     * @param inputDate A date to compare
+     * @return true if before the current date or false if after
+     */
+    private boolean isDateBeforeToday(Date inputDate)
+    {
+        Date currentDate = new Date();      
+        if(inputDate.before(currentDate)){
+            return true;
+        }else
+            return false;
+    }
+
+    /**
      * Method displayHallReviews
      * This method is used to display the view reviews screen
      * @param hallID the selected hall id
@@ -1037,56 +1098,56 @@ public class PrimeEvent
         {
             System.out.println(paymentDetail);
             boolean isValid = false;
-        System.out.println("\nOptions:");
-        while(!isValid)
-        {
-            char choice = acceptStringInput("1. Accept Payment\n2. Reject Payment\nB. Go Back\nEnter your choice:").charAt(0);
-            switch(choice)
+            System.out.println("\nOptions:");
+            while(!isValid)
             {
-                case '1': isValid = true; 
-                char accept = acceptStringInput("Do you want to accept the payment(y/n)?").charAt(0);
-                switch(accept)
+                char choice = acceptStringInput("1. Accept Payment\n2. Reject Payment\nB. Go Back\nEnter your choice:").charAt(0);
+                switch(choice)
                 {
-                    case 'y':
-                    isValid = true;
-                    getEvent().updatePaymentnStatus(quotationID, "ACCEPTED");
-                    System.out.println("Payment accepted!!");
-                    displayPayments(userID);
+                    case '1': isValid = true; 
+                    char accept = acceptStringInput("Do you want to accept the payment(y/n)?").charAt(0);
+                    switch(accept)
+                    {
+                        case 'y':
+                        isValid = true;
+                        getEvent().updatePaymentnStatus(quotationID, "ACCEPTED");
+                        System.out.println("Payment accepted!!");
+                        displayPayments(userID);
+                        break;
+                        case 'n':
+                        isValid = true;
+                        System.out.println("Action cancelled!! Going back to Payment details");
+                        displayPaymentDetail(userID,quotationID);
+                        break;
+                        default:
+                        System.out.println("Invalid choice. Please try again!");
+                    }
                     break;
-                    case 'n':
-                    isValid = true;
-                    System.out.println("Action cancelled!! Going back to Payment details");
-                    displayPaymentDetail(userID,quotationID);
+                    case '2': isValid = true;
+                    char input = acceptStringInput("Do you want to reject the payment(y/n)?").charAt(0);
+                    switch(input)
+                    {
+                        case 'y':
+                        isValid = true;
+                        getEvent().updatePaymentnStatus(quotationID, "REJECTED");
+                        displayPayments(userID);
+                        System.out.println("Quotation rejected!!");
+                        break;
+                        case 'n':
+                        isValid = true;
+                        System.out.println("Action cancelled!! Going back to Quotation details");
+                        displayPaymentDetail(userID,quotationID);
+                        break;
+                        default:
+                        System.out.println("Invalid choice. Please try again!");
+                    }
                     break;
+                    case 'b': isValid = true; 
+                    displayPayments(userID); break;
                     default:
                     System.out.println("Invalid choice. Please try again!");
                 }
-                break;
-                case '2': isValid = true;
-                char input = acceptStringInput("Do you want to reject the payment(y/n)?").charAt(0);
-                switch(input)
-                {
-                    case 'y':
-                    isValid = true;
-                    getEvent().updatePaymentnStatus(quotationID, "REJECTED");
-                    displayPayments(userID);
-                    System.out.println("Quotation rejected!!");
-                    break;
-                    case 'n':
-                    isValid = true;
-                    System.out.println("Action cancelled!! Going back to Quotation details");
-                    displayPaymentDetail(userID,quotationID);
-                    break;
-                    default:
-                    System.out.println("Invalid choice. Please try again!");
-                }
-                break;
-                case 'b': isValid = true; 
-                displayPayments(userID); break;
-                default:
-                System.out.println("Invalid choice. Please try again!");
             }
-        }
         }
         else
         {
@@ -1128,7 +1189,7 @@ public class PrimeEvent
             }
         }
     }
-    
+
     public void displayUnderImplementation()
     {
         displayHeader("UNDER IMPLEMENTATION");

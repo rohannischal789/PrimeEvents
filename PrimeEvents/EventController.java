@@ -125,6 +125,7 @@ public class EventController
             if(getUsers().get(i).getUserId() == userId)
             {
                 getUsers().get(i).setIsLockedOut(status);   
+                getUsers().get(i).setInvalidLogoutAttempts(0);   
             }
         }
         writeToUsersFile("users.txt",false,false);
@@ -1097,7 +1098,7 @@ public class EventController
         {
             strBuf.append(booking.getQuotation().getQuotationId() + ". " + getHallById(booking.getQuotation().getHallId()).getHallName() + ", (" 
                 + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(booking.getQuotation().getStartEventDateTime()) + " -"
-                + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(booking.getQuotation().getEndEventDateTime()) + ") - " + booking.getPayment().getPaymentStatus());
+                + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(booking.getQuotation().getEndEventDateTime()) + ") - " + booking.getPayment().getPaymentStatus() + "\n");
 
         }
         return strBuf.toString();
@@ -1142,7 +1143,7 @@ public class EventController
             }
         }
     }
-    
+
     /*
     private void manageBooking()
     {
@@ -1402,5 +1403,15 @@ public class EventController
             }
         }
         return strBuff.toString();
+    }
+
+    public boolean isEmailUsed(String email)
+    {
+        for(User user: users)
+        {
+            if(user.getEmail().equalsIgnoreCase(email))
+                return true;
+        }
+        return false;
     }
 }

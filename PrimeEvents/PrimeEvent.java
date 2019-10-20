@@ -641,7 +641,7 @@ public class PrimeEvent
                 case 'y':
                 isValid = true;
                 getEvent().requestQuotation(id, startEventDate,endEventDate,noOfAttendees,eventType, requiresCatering,specialReq,finalPrice);
-                System.out.println("Your quotation request has been sent to the owner. Once the owner responds, you can use the View Quotation Responses option to view it! Press any key to go to search halls");
+                System.out.println("Your quotation request has been sent to the owner.\nOnce the owner responds, you can use the View Quotation Responses option to view it! \nPress enter to go to search halls");
                 break;
                 case 'n':
                 isValid = true;
@@ -718,7 +718,7 @@ public class PrimeEvent
         }
         else
         {
-            System.out.println("There are no reviews currently for the hall! Press any key to go back");
+            System.out.println("There are no reviews currently for the hall! Press enter to go back");
             promptForKey();
             displayHallDetails(hallID);
         }
@@ -765,7 +765,7 @@ public class PrimeEvent
         }
         else
         {
-            System.out.println("You have not made any quotations yet! Press any key to go back");
+            System.out.println("You have not made any quotations yet! Press enter to go back");
             promptForKey();
             displayHome();
         }        
@@ -794,7 +794,7 @@ public class PrimeEvent
                 {
                     if(getEvent().isBookingDepositPaid(userID, quotationID))
                     {
-                        System.out.println("You have already paid the deposit for the booking. Press any key to go back");
+                        System.out.println("\nYou have already paid the deposit for the booking. Press enter to go back");
                         promptForKey();
                         displayQuotationResponse(userID);
                     }
@@ -812,7 +812,7 @@ public class PrimeEvent
                     }
                     else
                     {
-                        System.out.println("The quotation has not been accepted yet! Kindly wait for the hall owner to accept it and then proceed with the deposit. Press any key to go back");
+                        System.out.println("\nThe quotation has not been accepted yet! Kindly wait for the hall owner to accept it and then proceed with the deposit. Press enter to go back");
                         promptForKey();
                         displayQuotationResponse(userID);
                     }
@@ -874,7 +874,7 @@ public class PrimeEvent
                     }
                     else
                     {
-                        System.out.println("The quotation has already been accepted/rejected. Press any key to go back");
+                        System.out.println("The quotation has already been accepted/rejected. Press enter to go back");
                         promptForKey();
                         displayQuotationRequests(userID);
                     }
@@ -883,7 +883,7 @@ public class PrimeEvent
         }
         else
         {
-            System.out.println("Invalid quotation ID! Press any key to go back");
+            System.out.println("Invalid quotation ID! Press enter to go back");
             promptForKey();
             if(getEvent().getUserRole(userID).equals("CUSTOMER"))
             {
@@ -1151,7 +1151,7 @@ public class PrimeEvent
         }
         else
         {
-            System.out.println("Invalid payment ID! Press any key to try again");
+            System.out.println("Invalid payment ID! Press enter to try again");
             promptForKey();
             displayPayments(userID);
         }

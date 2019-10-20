@@ -1009,8 +1009,9 @@ public class EventController
                 }
             }
         }
-        double depositAmount = currQuotation.getFinalPrice() * (currHall.getDeposit()/100);
-        double balanceAmount = currQuotation.getFinalPrice() - depositAmount;
+        double scale = Math.pow(10, 2);
+        double depositAmount = Math.round(((double)currQuotation.getFinalPrice() * ((double)currHall.getDeposit()/(double)100))*scale)/scale;
+        double balanceAmount = Math.round((currQuotation.getFinalPrice() - depositAmount)*scale )/scale;
         currQuotation.setDepositPaid(true);
         String receiptNo = new SimpleDateFormat("ddMMyyyyHHmmss").format(System.currentTimeMillis());
         receiptNo += customerId;
@@ -1028,6 +1029,7 @@ public class EventController
      */
     public String getReceipt(int userID, int quotationID)
     {
+        double scale = Math.pow(10, 2);
         StringBuffer strBuf = new StringBuffer("");
         for(Hall hall : halls)
         {
@@ -1035,11 +1037,11 @@ public class EventController
             {
                 if(quotation.getQuotationId() == quotationID) 
                 {
-                    double depositAmount = quotation.getFinalPrice() * (hall.getDeposit()/100);
+                    double depositAmount = Math.round(((double)quotation.getFinalPrice() * ((double)hall.getDeposit()/(double)100))*scale)/scale;
                     strBuf.append("Hall Name: " + hall.getHallName() + "\nBooking Start Date: " 
                         + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotation.getStartEventDateTime()) + "\nBooking End Date: " 
                         + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotation.getEndEventDateTime()) + "\nTotal Price: " + quotation.getFinalPrice()
-                        + "\nDeposit Paid: " + depositAmount + "\nBalance: " + (quotation.getFinalPrice() - depositAmount));
+                        + "\nDeposit Paid: " + depositAmount + "\nBalance: " + (Math.round((quotation.getFinalPrice() - depositAmount)*scale )/scale));
                 }
             }
         }

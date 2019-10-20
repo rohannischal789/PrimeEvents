@@ -276,19 +276,11 @@ public class Hall
         return hallId + ". " + hallName + ", " + suburb;
     }
 
-    /*
-    Name: Hall 17
-    Suburb: Clayton
-    Address: 17, Clayton Road, Clayton
-    Capacity: 300
-    Deposit: 50%
-    Event Types: Wedding ceremony, Wedding reception, Birthday, Anniversary
-    Price: $1200 (Catering extra)
-     */
     public String displayLong()
     {
         return "Name: " + hallName + "\nSuburb: " + suburb + "\nAddress: " + address + "\nCapacity: "
-        + capacity + "\nDeposit: " + deposit + "%\nEvent Types: " +  getAllEventTypes() + "\nPrice: " + price + "\nBooked Dates:" + getFormattedBookings();
+        + capacity + "\nDeposit: " + deposit + "%\nEvent Types: " +  getAllEventTypes() + "\nPrice: " + price 
+        + "\nBooked Dates:" + (getFormattedBookings().equals("") ? "None yet" : getFormattedBookings());
     }
     
     private String getFormattedBookings()
@@ -445,8 +437,10 @@ public class Hall
         for(Quotation quotation: getQuotations())
         {
             if(quotation.getQuotationId() == quotationID)
-                str.append(quotation.getQuotationId() + ". " + getHallName() + ", " + getSuburb() + ", " 
-                + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotation.getStartEventDateTime()) + " - " + quotation.getQuotationStatus() + "\n");
+                str.append("Hall Name: " + getHallName() + "\nStart Date " 
+                + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotation.getStartEventDateTime()) + "\nEnd Date " + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotation.getEndEventDateTime())
+                + "\nAttendees: " + quotation.getNumberOfAttendees() + "\nEvent type: " + quotation.getEventType() + "\nSpecial Requirements: " + quotation.getSpecialRequirements()
+                + "\nFinal Price: " + quotation.getFinalPrice() + "\nQuotationStatus: " + quotation.getQuotationStatus() + "\n");
         }
         return str.toString();
     }

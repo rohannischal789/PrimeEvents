@@ -1,30 +1,30 @@
-9;expedite B2C content;4;2
-12;embrace dynamic platforms;3;2
-16;synthesize 24/365 content;10;4
-8;embrace collaborative web-readiness;2;2
-17;drive dynamic e-business;4;2
-1;reinvent extensible infrastructures;7;4
-13;innovate holistic bandwidth;1;3
-5;mesh enterprise partnerships;9;2
-11;harness interactive networks;1;3
-11;strategize B2C e-markets;2;2
-6;orchestrate open-source architectures;2;2
-6;grow world-class deliverables;1;2
-8;extend innovative e-services;3;5
-12;e-enable strategic networks;3;3
-17;redefine dynamic relationships;3;4
-6;whiteboard bleeding-edge technologies;2;5
-1;architect extensible synergies;4;2
-2;harness user-centric action-items;1;2
-20;innovate distributed e-commerce;4;4
-15;mesh holistic supply-chains;4;2
-11;scale seamless infrastructures;3;3
-11;matrix wireless action-items;2;3
-14;engineer mission-critical vortals;3;4
-17;visualize frictionless networks;2;3
-20;drive magnetic e-commerce;2;5
-7;optimize dynamic functionalities;4;5
-19;grow 24/365 interfaces;4;5
-17;empower collaborative users;4;5
-12;innovate intuitive e-commerce;2;2
-13;redefine visionary e-services;2;3
+9;Great Hall with Amazing view;4;2
+12;Highly spacious hall with great features;3;2
+16;Amazing hall and staff;10;4
+8;Highly spacious hall with great features;2;2
+17;Amazing hall and staff;4;2
+1;This hall caters for every occassion! Great experience;7;4
+13;Hall with innovative design. Loved it!!;1;3
+5;Great experience. Would visit again;9;2
+11;Hall with innovative design. Loved it!!;1;3
+11;Amazing hall and staff;2;2
+6;Great experience. Would visit again;2;2
+6;Hall with innovative design. Loved it!!;1;2
+8;Amazing hall and staff;3;5
+12;Great experience. Would visit again;3;3
+17;Hall with innovative design. Loved it!!;3;4
+6;Great Hall with Amazing view;2;5
+1;This hall caters for every occassion! Great experience;4;2
+2;Amazing hall and staff;1;2
+20;Reasonable hall. Lovely experience;4;4
+15;Great experience. Would visit again;4;2
+11;Great Hall with Amazing view;3;3
+11;Highly spacious hall with great features;2;3
+14;Hall with innovative design. Loved it!!;3;4
+17;Great experience. Would visit again;2;3
+20;Reasonable hall. Lovely experience;2;5
+7;Great experience. Would visit again;4;5
+19;Highly spacious hall with great features;4;5
+17;Great Hall with Amazing view;4;5
+12;This hall caters for every occassion! Great experience;2;2
+13;This hall caters for every occassion! Great experience;2;3

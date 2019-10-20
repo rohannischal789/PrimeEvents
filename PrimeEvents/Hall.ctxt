@@ -68,7 +68,6 @@ comment3.target=int\ getHallId()
 comment3.text=\r\n\ Returns\ value\ of\ hallId\r\n\ @return\r\n
 comment30.params=
 comment30.target=java.lang.String\ displayLong()
-comment30.text=\r\n\ \ \ \ Name\:\ Hall\ 17\r\n\ \ \ \ Suburb\:\ Clayton\r\n\ \ \ \ Address\:\ 17,\ Clayton\ Road,\ Clayton\r\n\ \ \ \ Capacity\:\ 300\r\n\ \ \ \ Deposit\:\ 50%\r\n\ \ \ \ Event\ Types\:\ Wedding\ ceremony,\ Wedding\ reception,\ Birthday,\ Anniversary\r\n\ \ \ \ Price\:\ $1200\ (Catering\ extra)\r\n
 comment31.params=
 comment31.target=java.lang.String\ getFormattedBookings()
 comment32.params=

@@ -575,6 +575,15 @@ public class PrimeEvent
                     isValid = true;
                 else
                     System.out.println("Entered Datetime should be greater than current Datetime");
+                if(isValid && !getEvent().isHallBookedForDate(id, startEventDate))
+                {
+                    isValid = true;
+                }
+                else
+                {
+                    System.out.println("Hall is already booked for the mentioned date");
+                    isValid = false;
+                }
             }
             catch(ParseException ex)
             {
@@ -594,6 +603,15 @@ public class PrimeEvent
                     isValid = true;
                 else
                     System.out.println("Event end date should be greater than event start date");
+                if(isValid && !getEvent().isHallBookedForDate(id, endEventDate))
+                {
+                    isValid = true;
+                }
+                else
+                {
+                    System.out.println("Hall is already booked for the mentioned date");
+                    isValid = false;
+                }
             }
             catch(ParseException ex)
             {

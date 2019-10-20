@@ -314,7 +314,7 @@ public class Hall
         StringBuffer strBuf = new StringBuffer("");
         for(Quotation quotation : getQuotations())
         {
-            if(quotation.getDepositPaid())
+            if(quotation.getQuotationStatus().equals("ACCEPTED"))
             {
                 strBuf.append(" " + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotation.getStartEventDateTime()) +" - " 
                 + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(quotation.getEndEventDateTime()) + ". " );

@@ -1,11 +1,12 @@
 #BlueJ class context
 comment0.target=Review
-comment0.text=\r\n\ Write\ a\ description\ of\ class\ Review\ here.\r\n\r\n\ @author\ (your\ name)\r\n\ @version\ (a\ version\ number\ or\ a\ date)\r\n
+comment0.text=\r\n\ Class\ Review\ is\ used\ to\ group\ all\ the\ attributes\ related\ to\ review\ and\ associate\ that\ with\ the\ hall\ class.\r\n\r\n\ @author\ Rohan\ Nischal\r\n\ @version\ 5-10-2019\r\n
 comment1.params=
 comment1.target=Review()
 comment1.text=\r\n\ Constructor\ for\ objects\ of\ class\ Review\r\n
 comment2.params=newReview\ newCustomer\ newRating
 comment2.target=Review(java.lang.String,\ Customer,\ int)
+comment2.text=\r\n\ Parameterized\ constructor\ for\ object\ of\ class\ review\r\n
 comment3.params=
 comment3.target=int\ getRating()
 comment3.text=\r\n\ Returns\ value\ of\ rating\r\n\ @return\r\n

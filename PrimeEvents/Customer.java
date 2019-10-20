@@ -1,9 +1,9 @@
 import java.util.Date;
 /**
- * Write a description of class Customer here.
+ * Class Customer is the child of parent class User.
  *
- * @author (your name)
- * @version (a version number or a date)
+ * @author Rohan Nischal
+ * @version 5-10-2019
  */
 public class Customer extends User
 {

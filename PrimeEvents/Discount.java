@@ -1,9 +1,9 @@
 import java.util.Date;
 /**
- * Write a description of class Discount here.
+ * Class Discount is used to offer different kinds of discounts and is associated with hall class.
  *
- * @author (your name)
- * @version (a version number or a date)
+ * @author Guanting Chen
+ * @version 5-10-2019
  */
 public class Discount
 {

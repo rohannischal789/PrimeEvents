@@ -1407,6 +1407,12 @@ public class EventController
         return strBuff.toString();
     }
 
+    /**
+     * Method isEmailUsed
+     * Checks if email has already been used
+     * @param email A email
+     * @return true if already used
+     */
     public boolean isEmailUsed(String email)
     {
         for(User user: users)

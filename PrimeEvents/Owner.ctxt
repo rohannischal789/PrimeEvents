@@ -1,9 +1,10 @@
 #BlueJ class context
 comment0.target=Owner
-comment0.text=\r\n\ Write\ a\ description\ of\ class\ Owner\ here.\r\n\r\n\ @author\ (your\ name)\r\n\ @version\ (a\ version\ number\ or\ a\ date)\r\n
+comment0.text=\r\nClass\ Owner\ is\ the\ child\ of\ parent\ class\ User.\r\n\r\n\ @author\ Rohan\ Nischal\r\n\ @version\ 5-10-2019\r\n
 comment1.params=
 comment1.target=Owner()
 comment1.text=\r\n\ Constructor\ for\ objects\ of\ class\ Owner\r\n
 comment2.params=newUserId\ newFirstName\ newLastName\ newPhoneNo\ newEmail\ newPassword\ newRole
 comment2.target=Owner(int,\ java.lang.String,\ java.lang.String,\ java.lang.String,\ java.lang.String,\ java.lang.String,\ java.lang.String)
+comment2.text=\r\n\ Parameterized\ constructor\ for\ owner\ class\r\n
 numComments=3

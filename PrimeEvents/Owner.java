@@ -1,9 +1,9 @@
 
 /**
- * Write a description of class Owner here.
+ *Class Owner is the child of parent class User.
  *
- * @author (your name)
- * @version (a version number or a date)
+ * @author Rohan Nischal
+ * @version 5-10-2019
  */
 public class Owner extends User
 {
@@ -18,6 +18,9 @@ public class Owner extends User
         
     }
     
+    /**
+     * Parameterized constructor for owner class
+     */
     public Owner(int newUserId, String newFirstName, String newLastName, 
     String newPhoneNo,String newEmail,String newPassword,String newRole)
     {

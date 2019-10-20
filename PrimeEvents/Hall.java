@@ -2,10 +2,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 /**
- * Write a description of class Hall here.
- *
- * @author (your name)
- * @version (a version number or a date)
+ * Class Hall is used to group all the different attributes of an hall object and this could be accessed 
+ * as and when required.
+ * @author Rohan Nischal,Guanting Chen,Swathi Jadhav
+ * @version 19-10-2019
  */
 public class Hall
 {
@@ -31,6 +31,9 @@ public class Hall
 
     }
 
+    /**
+     * Parameterized constructor for object of class Hall
+     */    
     public Hall(int hallId, String hallName, String suburb, String address, int capacity, int deposit, ArrayList<String> eventTypes, int price, Owner owner)
     {
         this.hallId = hallId;
@@ -225,11 +228,17 @@ public class Hall
         this.quotations = quotations;
     }
 
+    /**
+     * resets the value of reviews
+     */
     public void resetReviews() 
     {
         this.reviews = new ArrayList<Review>();
     }
 
+    /**
+     * resets the value of quotations
+     */
     public void resetQuotations() 
     {
         this.quotations = new ArrayList<Quotation>();
@@ -271,11 +280,24 @@ public class Hall
         this.discounts = discounts;
     }
 
+    /**
+     * Returns String
+     * @return
+     */
     public String displayShort()
     {
         return hallId + ". " + hallName + ", " + suburb;
     }
 
+    /**
+    * Name: Hall 17
+    * Suburb: Clayton
+    * Address: 17, Clayton Road, Clayton
+    * Capacity: 300
+    * Deposit: 50%
+    * Event Types: Wedding ceremony, Wedding reception, Birthday, Anniversary
+    * Price: $1200 (Catering extra)
+    */
     public String displayLong()
     {
         return "Name: " + hallName + "\nSuburb: " + suburb + "\nAddress: " + address + "\nCapacity: "
@@ -283,6 +305,10 @@ public class Hall
         + "\nBooked Dates:" + (getFormattedBookings().equals("") ? "None yet" : getFormattedBookings());
     }
     
+    /**
+    * Converting the booking date into a string format.
+    * @return
+    */
     private String getFormattedBookings()
     {
         StringBuffer strBuf = new StringBuffer("");
@@ -296,7 +322,11 @@ public class Hall
         }
         return strBuf.toString();
     }
-
+    
+    /**
+    * Getting all the list of "event type" values and converitng them into a single comma seperated string value.
+    * @return
+    */
     private String getAllEventTypes()
     {
         String toReturn = "";
@@ -308,6 +338,10 @@ public class Hall
         return toReturn;            
     }
 
+    /**
+    * Getting all the review objects associated with this class's Hall object. 
+    * @return
+    */
     public String getAllReviews()
     {
         String toReturn = "";
@@ -319,11 +353,21 @@ public class Hall
         return toReturn;            
     }
 
+    /**
+    * Setting review object by passing parameterized constructor values of class Review. 
+    * Hall objects are associated to review object. 
+    * @param
+    */
     public void addReview(String newReview, Customer newCustomer,int newRating)
     {
         getReviews().add(new Review(newReview, newCustomer, newRating));
     }
 
+    /**
+    * Setting quotation object by passing parameterized constructor values of class quotation. 
+    * Hall objects are associated to quotation objects. 
+    * @param
+    */
     public void addQuotation(int quotationId, Date startEventDateTime, Date endEventDateTime, int numberOfAttendees,String eventType,
     boolean requiresCatering, String specialRequirements, double finalPrice, String quotationStatus, Customer customer, int hallId, boolean depositPaid)
     {
@@ -331,6 +375,10 @@ public class Hall
                 requiresCatering, specialRequirements,finalPrice, quotationStatus,customer, hallId, depositPaid));
     }
 
+    /**
+    * Returns list of quotations based on the parameterized customer id value.    
+    * @param
+    */
     public ArrayList<Quotation> getQuotationByCustomerId(int customerId)
     {
         ArrayList<Quotation> quotationList = new ArrayList<Quotation>();
@@ -344,6 +392,10 @@ public class Hall
         return quotationList;
     }
 
+    /**
+    * Returns list of quotations based on the parameterized customer id value.    
+    * @param
+    */
     public String getCustomerQuotationResponses(int customerId)
     {
         StringBuffer str = new StringBuffer("");
@@ -356,6 +408,10 @@ public class Hall
         return str.toString();
     }
 
+    /**
+    * Returns customer quotation details on passing customer id and quotation id values.    
+    * @return
+    */
     public String getCustomerQuotationDetails(int customerId, int quotationId)
     {
         Quotation currQuotation = null;
@@ -380,6 +436,10 @@ public class Hall
         }
     }
     
+    /**
+    * Returns customer receipt details on passing customer id and quotation id values.    
+    * @return
+    */
     public String getFormattedReceipt(int customerId, int quotationId)
     {
         Quotation currQuotation = null;
@@ -404,6 +464,10 @@ public class Hall
         }
     }
 
+    /**
+    * Returns quotaion object on passing quotation id value.    
+    * @return
+    */
     public Quotation getQuotationById(int id)
     {
         for(Quotation quotation : getQuotations())
@@ -417,6 +481,10 @@ public class Hall
         return null;
     }
     
+    /**
+    * Returns quotation object on passing quotation id value.    
+    * @return
+    */
     public String getQuotationRequests()
     {
         StringBuffer str = new StringBuffer("");
@@ -429,7 +497,10 @@ public class Hall
         return str.toString();
     }
     
-    
+    /**
+    * Returns quotation details on passing quotation id value.    
+    * @return
+    */
     public String getQuotationRequestsByID(int quotationID)
     {
         StringBuffer str = new StringBuffer("");

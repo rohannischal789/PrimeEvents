@@ -1,9 +1,9 @@
 import java.util.Date;
 /**
- * Write a description of class Booking here.
+ * Class Booking is used to group all the attributes related to booking and associate that with the Event Controller class.
  *
- * @author (your name)
- * @version (a version number or a date)
+ * @author Guanting Chen
+ * @version 5-10-2019
  */
 public class Booking
 {
@@ -20,6 +20,9 @@ public class Booking
         // initialise instance variables
     }
 
+    /**
+     * Parameterized constructor for object of class booking
+     */ 
     public Booking(String status, Payment payment, Quotation quotation)
     {
         this.status = status;

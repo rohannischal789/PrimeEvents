@@ -1,13 +1,13 @@
 
 /**
- * Write a description of class Review here.
+ * Class Review is used to group all the attributes related to review and associate that with the hall class.
  *
- * @author (your name)
- * @version (a version number or a date)
+ * @author Rohan Nischal
+ * @version 5-10-2019
  */
 public class Review
 {
-    // instance variables - replace the example below with your own
+    // instance variables of class review
     private int rating;
     private String review;
     private Customer customer;
@@ -20,6 +20,9 @@ public class Review
         // initialise instance variables
     }
     
+    /**
+     * Parameterized constructor for object of class review
+     */        
     public Review(String newReview, Customer newCustomer,int newRating)
     {
         rating = newRating;

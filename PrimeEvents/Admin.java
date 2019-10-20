@@ -1,9 +1,9 @@
 
 /**
- * Write a description of class Admin here.
+ * Class Admin is the child of parent class User.
  *
- * @author (your name)
- * @version (a version number or a date)
+ * @author Rohan Nischal
+ * @version 5-10-2019
  */
 public class Admin extends User
 {

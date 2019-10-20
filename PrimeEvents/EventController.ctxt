@@ -151,6 +151,7 @@ comment54.target=java.lang.String\ getAllUsers()
 comment54.text=\r\n\ Method\ getAllUsers\r\n\ This\ method\ returns\ the\ formatted\ details\ of\ all\ the\ users\ except\ administrator\r\n\ @return\ The\ formatted\ user\ details\r\n
 comment55.params=email
 comment55.target=boolean\ isEmailUsed(java.lang.String)
+comment55.text=\r\n\ Method\ isEmailUsed\r\n\ Checks\ if\ email\ has\ already\ been\ used\r\n\ @param\ email\ A\ email\r\n\ @return\ true\ if\ already\ used\r\n
 comment6.params=newUsers
 comment6.target=void\ setUsers(java.util.ArrayList)
 comment6.text=\r\n\ Method\ setUsers\r\n\ mutator\ method\ for\ the\ arraylist\ of\ users\r\n\ @param\ newUsers\ A\ list\ of\ users\r\n

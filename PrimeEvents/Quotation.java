@@ -1,10 +1,10 @@
 import java.util.Date;
 
 /**
- * Write a description of class Quotation here.
+ * Class Quotation is used to group all the attributes related to quotaion and associate that with the hall class.
  *
- * @author (your name)
- * @version (a version number or a date)
+ * @author Rohan Nischal,Guanting Chen,Swathi Jadhav
+ * @version 19-10-2019
  */
 public class Quotation
 {
@@ -31,6 +31,9 @@ public class Quotation
 
     }
 
+    /**
+     * Parameterized constructor for object of class quotation
+     */
     public Quotation(int quotationId, Date startEventDateTime, Date endEventDateTime, int numberOfAttendees,String eventType,
     boolean requiresCatering, String specialRequirements, double finalPrice, String quotationStatus,
     Customer customer, int hallId, boolean depositPaid)
@@ -211,6 +214,10 @@ public class Quotation
         this.customer = customer;
     }
 
+    /**
+     * Returns value of hallId
+     * @return
+     */
     public int getHallId()
     {
         return hallId;
@@ -225,11 +232,19 @@ public class Quotation
         this.hallId = hallId;
     }
     
+    /**
+     * Returns value of deposit paid
+     * @return
+     */    
     public boolean getDepositPaid()
     {
         return depositPaid;
     }
 
+    /**
+     * Sets new value of deposit paid
+     * @param
+     */
     public void setDepositPaid(boolean depositPaid) 
     {
         this.depositPaid = depositPaid;

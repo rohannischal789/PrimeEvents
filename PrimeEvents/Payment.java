@@ -1,9 +1,9 @@
 
 /**
- * Write a description of class Payment here.
+ * Class Payment is used to group all the attributes related to payment and associate that with the Booking class.
  *
- * @author (your name)
- * @version (a version number or a date)
+ * @author Guanting Chen
+ * @version 5-10-2019
  */
 public class Payment
 {
@@ -22,6 +22,9 @@ public class Payment
         // initialise instance variables
     }
 
+    /**
+     * Parameterized constructor for object of class payment
+     */ 
     public Payment(String receiptNo, double depositAmount, double balanceAmount, String paymentType, String paymentStatus)
     {
         this.receiptNo = receiptNo;

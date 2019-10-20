@@ -1,6 +1,6 @@
 #BlueJ class context
 comment0.target=Payment
-comment0.text=\r\n\ Write\ a\ description\ of\ class\ Payment\ here.\r\n\r\n\ @author\ (your\ name)\r\n\ @version\ (a\ version\ number\ or\ a\ date)\r\n
+comment0.text=\r\n\ Class\ Payment\ is\ used\ to\ group\ all\ the\ attributes\ related\ to\ payment\ and\ associate\ that\ with\ the\ Booking\ class.\r\n\r\n\ @author\ Guanting\ Chen\r\n\ @version\ 5-10-2019\r\n
 comment1.params=
 comment1.target=Payment()
 comment1.text=\r\n\ Constructor\ for\ objects\ of\ class\ Payment\r\n
@@ -15,6 +15,7 @@ comment12.target=void\ setPaymentStatus(java.lang.String)
 comment12.text=\r\n\ Sets\ new\ value\ of\ paymentStatus\r\n\ @param\r\n
 comment2.params=receiptNo\ depositAmount\ balanceAmount\ paymentType\ paymentStatus
 comment2.target=Payment(java.lang.String,\ double,\ double,\ java.lang.String,\ java.lang.String)
+comment2.text=\r\n\ Parameterized\ constructor\ for\ object\ of\ class\ payment\r\n
 comment3.params=
 comment3.target=java.lang.String\ getReceiptNo()
 comment3.text=\r\n\ Returns\ value\ of\ paymentId\r\n\ @return\r\n
